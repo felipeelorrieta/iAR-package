@@ -1,5 +1,10 @@
-url: https://felipeelorrieta.github.io/iAR/
+url: https://felipeelorrieta.github.io/iAR-package/
 template:
   bootstrap: 5
   bootswatch: flatly
 
+navbar:
+  right:
+    - text: "Home page"
+      href: "https://felipeelorrieta.github.io/"
+      external: true

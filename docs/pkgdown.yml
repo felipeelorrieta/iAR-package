@@ -2,7 +2,7 @@ pandoc: '3.2'
 pkgdown: 2.1.3
 pkgdown_sha: ~
 articles: {}
-last_built: 2025-07-03T04:56Z
+last_built: 2025-07-03T05:22Z
 urls:
-  reference: https://felipeelorrieta.github.io/iAR/reference
-  article: https://felipeelorrieta.github.io/iAR/articles
+  reference: https://felipeelorrieta.github.io/iAR-package/reference
+  article: https://felipeelorrieta.github.io/iAR-package/articles
