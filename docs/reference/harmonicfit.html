@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">iAR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,7 +26,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Harmonic Fit to Time Series</h1>
-      <small class="dont-index">Source: <a href="NA/NA/NA/blob/HEAD/R/harmonicfit.R"><code>R/harmonicfit.R</code></a></small>
+
       <div class="d-none name"><code>harmonicfit.Rd</code></div>
     </div>
 
@@ -36,69 +36,72 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">harmonicfit</span><span class="op">(</span></span>
-<span>  <span class="va">file</span>,</span>
-<span>  <span class="va">f1</span>,</span>
-<span>  nham <span class="op">=</span> <span class="fl">4</span>,</span>
-<span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  print <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  remove_trend <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">harmonicfit</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-file">file<a class="anchor" aria-label="anchor" href="#arg-file"></a></dt>
-<dd><p>A matrix with two columns. The first column corresponds to the observations times, and the second column corresponds to the measures.</p></dd>
+<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>An object of class `utilities`.</p></dd>
 
 
-<dt id="arg-f-">f1<a class="anchor" aria-label="anchor" href="#arg-f-"></a></dt>
-<dd><p>Frequency (1/Period) of the time series</p></dd>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Additional arguments for pairing time series:</p><dl><dt>data</dt>
+<dd><p>A data frame with three columns corresponding to the time, values, and standard errors of the irregularly observed time series.</p></dd>
 
+  <dt>f1</dt>
+<dd><p>frequency (1 / period) of the time series.</p></dd>
 
-<dt id="arg-nham">nham<a class="anchor" aria-label="anchor" href="#arg-nham"></a></dt>
-<dd><p>Number of harmonic components in the model</p></dd>
+  <dt>nham</dt>
+<dd><p>Number of harmonic components in the model.</p></dd>
 
+  <dt>weighted</dt>
+<dd><p>logical; if true, a weighted least squares (WLS) estimation is performed using weights based on the standard deviations of the errors. Default is 'FALSE'.</p></dd>
 
-<dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>An array with the weights of each observation</p></dd>
-
-
-<dt id="arg-print">print<a class="anchor" aria-label="anchor" href="#arg-print"></a></dt>
-<dd><p>logical; if true, the summary of the harmonic fitted model will be printed. The default value is false.</p></dd>
-
-
-<dt id="arg-remove-trend">remove_trend<a class="anchor" aria-label="anchor" href="#arg-remove-trend"></a></dt>
+  <dt>remove_trend</dt>
 <dd><p>logical; if true, the linear trend of time series will be removed before the the harmonic model is fitted.</p></dd>
+
+
+</dl></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list with the following components:</p>
-<dl><dt>res</dt>
-<dd><p>Residuals to the harmonic fit of the time series.</p></dd>
+    <p>An object of class `utilities` with the slots:</p>
+<dl><dt>fitted_values</dt>
+<dd><p>Fitted values from the harmonic model.</p></dd>
 
-<dt>t</dt>
-<dd><p>Observations times.</p></dd>
-
-<dt>R2</dt>
-<dd><p>Adjusted R-Squared.</p></dd>
-
-<dt>MSE</dt>
-<dd><p>Mean Squared Error.</p></dd>
+<dt>residuals</dt>
+<dd><p>Residuals from the harmonic model.</p></dd>
 
 <dt>coef</dt>
-<dd><p>Summary of the coefficients estimated by the harmonic model.</p></dd>
+<dd><p>Estimated coefficients of the harmonic model.</p></dd>
+
+<dt>summary</dt>
+<dd><p>A summary object containing detailed model information.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The function fits a harmonic regression model with 'nham' components to the input time series, optionally removing a linear trend and allowing for weighted estimation when standard errors are available.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Elorrieta F, Eyheramendy S, Palma W, Ojeda C (2021).
+“A novel bivariate autoregressive model for predicting and forecasting irregularly observed time series.”
+<em>Monthly Notices of the Royal Astronomical Society</em>, <b>505</b>(1), 1105-1116.
+ISSN 0035-8711, <a href="https://doi.org/10.1093/mnras/stab1216" class="external-link">doi:10.1093/mnras/stab1216</a>
+, https://academic.oup.com/mnras/article-pdf/505/1/1105/38391762/stab1216.pdf.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clcep</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">f1</span><span class="op">=</span><span class="fl">0.060033386</span></span></span>
-<span class="r-in"><span><span class="co">#results=harmonicfit(file=clcep[,1:2],f1=f1)</span></span></span>
+<span class="r-in"><span><span class="va">o1</span><span class="op">=</span><span class="fu">iAR</span><span class="fu">::</span><span class="fu"><a href="utilities.html">utilities</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">o1</span><span class="op">&lt;-</span><span class="fu"><a href="phase.html">phase</a></span><span class="op">(</span><span class="va">o1</span>,data<span class="op">=</span><span class="va">clcep</span>,f1<span class="op">=</span><span class="va">f1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co">#results$R2</span></span></span>
 <span class="r-in"><span><span class="co">#results$MSE</span></span></span>
 <span class="r-in"><span><span class="co">#results=harmonicfit(file=clcep[,1:2],f1=f1,nham=3)</span></span></span>

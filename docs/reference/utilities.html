@@ -11,7 +11,7 @@ These include the functions `gentime`, `paringits`, `harmonicfit`, and `foldlc`.
 
     <a class="navbar-brand me-2" href="../index.html">iAR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,7 +30,7 @@ These include the functions `gentime`, `paringits`, `harmonicfit`, and `foldlc`.
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Utilities Class</h1>
-      <small class="dont-index">Source: <a href="NA/NA/NA/blob/HEAD/R/00_utilities.R"><code>R/00_utilities.R</code></a></small>
+
       <div class="d-none name"><code>utilities.Rd</code></div>
     </div>
 
@@ -46,6 +46,13 @@ These include the functions `gentime`, `paringits`, `harmonicfit`, and `foldlc`.
 <span>  times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
 <span>  series <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
 <span>  series_esd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  times_phased <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  series_phased <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  series_esd_phased <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  fitted_values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  residuals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  coef <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  summary <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  paired <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -64,6 +71,34 @@ These include the functions `gentime`, `paringits`, `harmonicfit`, and `foldlc`.
 
 <dt id="arg-series-esd">series_esd<a class="anchor" aria-label="anchor" href="#arg-series-esd"></a></dt>
 <dd><p>A numeric vector representing the error standard deviations of the time series.</p></dd>
+
+
+<dt id="arg-times-phased">times_phased<a class="anchor" aria-label="anchor" href="#arg-times-phased"></a></dt>
+<dd><p>A numeric vector of phased times.</p></dd>
+
+
+<dt id="arg-series-phased">series_phased<a class="anchor" aria-label="anchor" href="#arg-series-phased"></a></dt>
+<dd><p>A numeric vector containing the time series values ordered by phase.</p></dd>
+
+
+<dt id="arg-series-esd-phased">series_esd_phased<a class="anchor" aria-label="anchor" href="#arg-series-esd-phased"></a></dt>
+<dd><p>A numeric vector containing the error standard deviations of the time series ordered by phase.</p></dd>
+
+
+<dt id="arg-fitted-values">fitted_values<a class="anchor" aria-label="anchor" href="#arg-fitted-values"></a></dt>
+<dd><p>A numeric vector containing the fitted values from the harmonic model.</p></dd>
+
+
+<dt id="arg-residuals">residuals<a class="anchor" aria-label="anchor" href="#arg-residuals"></a></dt>
+<dd><p>A numeric vector containing the residuals from the harmonic model.</p></dd>
+
+
+<dt id="arg-coef">coef<a class="anchor" aria-label="anchor" href="#arg-coef"></a></dt>
+<dd><p>A numeric vector containing the estimated coefficients of the harmonic model.</p></dd>
+
+
+<dt id="arg-summary">summary<a class="anchor" aria-label="anchor" href="#arg-summary"></a></dt>
+<dd><p>A summary object containing the harmonic model information.</p></dd>
 
 
 <dt id="arg-paired">paired<a class="anchor" aria-label="anchor" href="#arg-paired"></a></dt>

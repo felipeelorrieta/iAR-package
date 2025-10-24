@@ -155,16 +155,14 @@ S7::method(generic = fit, signature = BiAR) <- function(x) {
   if(length(x@series)==0) stop("The fit method needs a bivariate time series")
   if(length(x@coef)==0) stop("The fit method needs the coefficients of the BiAR model")
   no_series_esd <- is.integer(x@series_esd)
-  if(no_series_esd) x@series_esd <- matrix(0, ncol = 2)
+  if(no_series_esd) x@series_esd <- matrix(0, ncol = 2,nrow=length(x@series[,1]))
   res <- BiARfit(coef = x@coef,
                    series1 = x@series[,1],
                    series2 = x@series[,2],
                    times = x@times,
                    series_esd1 = x@series_esd[,1],
                    series_esd2 = x@series_esd[,2],
-                   zero_mean = x@zero_mean
-                   # standardized = x@standardized,
-                   )
+                   zero_mean = x@zero_mean)
   x@fitted_values <- t(res$fitted)
   x@rho <- res$rho
   if(no_series_esd) x@series_esd <- integer(0)

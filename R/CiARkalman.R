@@ -49,7 +49,7 @@ CiARkalman<-function(series,times,series_esd=0,zero_mean=TRUE,standardized=TRUE,
   br<-0
   if(sum(series_esd)==0){
     series_esd=rep(0,length(series))}
-  summary=NULL
+  summary=list()
   for(i in 1:niter)
   {
     phiR=2*runif(1)-1
@@ -94,3 +94,4 @@ CiARkalman<-function(series,times,series_esd=0,zero_mean=TRUE,standardized=TRUE,
     par<-c(0,0)
   return(list(phiR=par[1],phiI=par[2],ll=aux,summary=summary))
 }
+

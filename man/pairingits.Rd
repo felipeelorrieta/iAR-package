@@ -11,13 +11,13 @@ pairingits(x, ...)
 
 \item{...}{Additional arguments for pairing time series: 
 \describe{
-  \item{lc1}{A data frame with three columns corresponding to the first irregularly observed time series.}
-  \item{lc2}{A data frame with three columns corresponding to the second irregularly observed time series.}
+  \item{data1}{A data frame with three columns corresponding to the first irregularly observed time series.}
+  \item{data2}{A data frame with three columns corresponding to the second irregularly observed time series.}
   \item{tol}{A numeric value indicating the tolerance parameter.}
 }}
 }
 \value{
-An object of class `utilities` with two slots:
+An object of class `utilities` with the slots:
 \item{series}{A matrix containing the paired time series, where unmatched measurements are filled with `NA`.}
 \item{series_esd}{A matrix containing the paired error standard deviations of the time series, where unmatched measurements are filled with `NA`.}
 \item{times}{A numeric vector with the paired observational times.}

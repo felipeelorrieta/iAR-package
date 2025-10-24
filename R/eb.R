@@ -13,5 +13,7 @@
 #' @examples
 #' data(eb)
 #' f1=1.510571586
-#' foldlc(eb,f1)
+#' o1=iAR::utilities()
+#' o1<-phase(o1,data=eb,f1=f1,twop=TRUE)
+#' plot(o1@times_phased,o1@series_phased,pch=20)
 "eb"

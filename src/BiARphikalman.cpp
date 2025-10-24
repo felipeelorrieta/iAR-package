@@ -60,6 +60,7 @@ double BiARphikalman(arma::vec yest,arma::vec coef, arma::vec series1, arma::vec
   arma::cx_double phi(coef[0], coef[1]);
   arma::vec y1 = series1;
   arma::vec y2 = series2;
+  
   double phiMod = std::sqrt(std::pow(phi.real(), 2.0) + std::pow(phi.imag(), 2.0));
   if(phiMod >= 1.0) {
     return 1e10;

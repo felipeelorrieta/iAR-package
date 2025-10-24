@@ -43,6 +43,7 @@ iARkalman<-function (series, times, series_esd=0,zero_mean=TRUE,standardized=TRU
     out = optimize(iARphikalman, interval = c(0, 1), series = series, times = times, series_esd=series_esd,zero_mean = zero_mean,standardized=standardized,yest=0)
     phi = out$minimum
     ll = out$objective
+    summary=list()
   }
   if(hessian==T)
   {

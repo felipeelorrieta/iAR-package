@@ -9,7 +9,7 @@ This method applies the Kalman filter to compute the likelihood and estimate the
 
     <a class="navbar-brand me-2" href="../index.html">iAR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,7 +28,7 @@ This method applies the Kalman filter to compute the likelihood and estimate the
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Maximum Likelihood Estimation of Parameters for iAR, CiAR, and BiAR Models using the Kalman Filter</h1>
-      <small class="dont-index">Source: <a href="NA/NA/NA/blob/HEAD/R/04_kalman.R"><code>R/04_kalman.R</code></a></small>
+
       <div class="d-none name"><code>kalman.Rd</code></div>
     </div>
 
@@ -110,7 +110,7 @@ ISSN 0035-8711, <a href="https://doi.org/10.1093/mnras/stab1216" class="external
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example 1: Applying Kalman filter for MLE of iAR model parameters</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/felipeelorrieta" class="external-link">iAR</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://felipeelorrieta.github.io/iAR-package/">iAR</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">n</span><span class="op">=</span><span class="fl">100</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">6714</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">o</span><span class="op">=</span><span class="fu">iAR</span><span class="fu">::</span><span class="fu"><a href="utilities.html">utilities</a></span><span class="op">(</span><span class="op">)</span></span></span>
@@ -120,7 +120,7 @@ ISSN 0035-8711, <a href="https://doi.org/10.1093/mnras/stab1216" class="external
 <span class="r-in"><span><span class="va">model_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim.html">sim</a></span><span class="op">(</span><span class="va">model_norm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">model_norm</span> <span class="op">&lt;-</span> <span class="fu">kalman</span><span class="op">(</span><span class="va">model_norm</span><span class="op">)</span>  </span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model_norm</span><span class="op">@</span><span class="va">coef</span><span class="op">)</span>  <span class="co"># Access the estimated coefficients</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.9088155</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.9088109</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model_norm</span><span class="op">@</span><span class="va">kalmanlik</span><span class="op">)</span>  <span class="co"># Access the Kalman likelihood value</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.2431375</span>
 <span class="r-in"><span></span></span>
@@ -134,7 +134,7 @@ ISSN 0035-8711, <a href="https://doi.org/10.1093/mnras/stab1216" class="external
 <span class="r-in"><span><span class="va">model_CiAR</span><span class="op">@</span><span class="va">series_esd</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>,<span class="va">n</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">model_CiAR</span> <span class="op">&lt;-</span> <span class="fu">kalman</span><span class="op">(</span><span class="va">model_CiAR</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model_CiAR</span><span class="op">@</span><span class="va">coef</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.9199923 0.1072453</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.9199923 -0.1072453</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model_CiAR</span><span class="op">@</span><span class="va">kalmanlik</span><span class="op">)</span>  </span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.2272269</span>
 <span class="r-in"><span></span></span>

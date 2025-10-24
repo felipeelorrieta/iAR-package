@@ -22,3 +22,6 @@ S7::method(plot, multidata) <- function(x, ...) {
   readline("Press [Enter] to show the next plot...")
   zoo::plot.zoo(zoo::zoo(x@series[,2], x@times), ...)
 }
+S7::method(plot, utilities) <- function(x, ...) {
+  zoo::plot.zoo(zoo::zoo(x@series_phased, x@times_phased), ...)
+}

@@ -16,7 +16,7 @@
 #'
 #'
 #' @export
-S7::method(summary, unidata) <- function(object,...) {
+S7::method(summary, iAR) <- function(object,...) {
   x=object
   cat("iAR model", "\n", sep = "")
   cat("\n", sep = "")
@@ -50,4 +50,28 @@ S7::method(summary, unidata) <- function(object,...) {
     cat("mean", "         ", format(round(x@mean,2),nsmall=2), "      ", format(round(x@summary$stderr[2],2),nsmall=2), "   ", format(round(x@summary$tvalue[2],2),nsmall=2), "     ", format(round(x@summary$pvalue[2],2),nsmall=2), "\n", sep = "")
     cat("variance", "     ", format(round(x@variance,2),nsmall=2), "      ", format(round(x@summary$stderr[3],2),nsmall=2), "    ", format(round(x@summary$tvalue[3],2),nsmall=2), "     ", format(round(x@summary$pvalue[3],2),nsmall=2), "\n", sep = "")
   }
+}
+
+S7::method(summary, CiAR) <- function(object,...) {
+  x=object
+  cat("CiAR model", "\n", sep = "")
+  cat("\n", sep = "")
+  cat("Coefficients:", "\n", sep = "")
+  cat(paste("    ", "Estimate St. Error t value Pr(>|t|)", "\n", sep = ""))
+  cat("phiR", "     ", format(round(x@coef[1],2),nsmall=2), "      ", format(round(x@summary$stderr[1],2),nsmall=2), "   ", format(round(x@summary$tvalue[1],2),nsmall=2), "     ", format(round(x@summary$pvalue[1],2),nsmall=2), "\n", sep = "")
+  cat("phiI", "     ", format(round(x@coef[2],2),nsmall=2), "      ", format(round(x@summary$stderr[2],2),nsmall=2), "    ", format(round(x@summary$tvalue[2],2),nsmall=2), "     ", format(round(x@summary$pvalue[2],2),nsmall=2), "\n", sep = "")
+}
+
+S7::method(summary, BiAR) <- function(object,...) {
+  x=object
+  cat("BiAR model", "\n", sep = "")
+  cat("\n", sep = "")
+  cat("Coefficients:", "\n", sep = "")
+  cat(paste("    ", "Estimate St. Error t value Pr(>|t|)", "\n", sep = ""))
+  cat("phiR", "     ", format(round(x@coef[1],2),nsmall=2), "      ", format(round(x@summary$stderr[1],2),nsmall=2), "   ", format(round(x@summary$tvalue[1],2),nsmall=2), "     ", format(round(x@summary$pvalue[1],2),nsmall=2), "\n", sep = "")
+  cat("phiI", "     ", format(round(x@coef[2],2),nsmall=2), "      ", format(round(x@summary$stderr[2],2),nsmall=2), "    ", format(round(x@summary$tvalue[2],2),nsmall=2), "     ", format(round(x@summary$pvalue[2],2),nsmall=2), "\n", sep = "")
+}
+
+S7::method(summary, utilities) <- function(object,...) {
+  print(object@summary)
 }

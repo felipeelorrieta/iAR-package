@@ -1,4 +1,4 @@
-# iAR <img src="logo_iAR_hex.png" width=150 align="right" alt="sticker"/>
+# iAR <img src="https://felipeelorrieta.github.io/research/logo_iAR_hex.png" width=150 align="right" alt="sticker"/>
 
 ## Description
 

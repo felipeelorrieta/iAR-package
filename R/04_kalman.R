@@ -101,9 +101,11 @@ S7::method(kalman, iAR) <- function(x) {
                      times = x@times,
                      series_esd = x@series_esd,
                      zero_mean = x@zero_mean,
-                     standardized = x@standardized)
+                     standardized = x@standardized,                     
+                     hessian = x@hessian)
     x@coef <- res$coef
     x@kalmanlik <- res$kalman
+    x@summary <- res$summary
     return(x)
   }
 }
@@ -116,11 +118,13 @@ S7::method(kalman, CiAR) <- function(x, c = 1, niter = 10, seed = NULL) {
                     series_esd = x@series_esd,
                     zero_mean = x@zero_mean,
                     standardized = x@standardized,
+                    hessian = x@hessian,
                     c = c,
                     niter = niter,
                     seed = seed)
   x@coef <- c(res$phiR, res$phiI)
   x@kalmanlik <- res$ll
+  x@summary <- res$summary
   return(x)
 }
 
@@ -137,13 +141,13 @@ S7::method(kalman, BiAR) <- function(x, niter = 10, seed = NULL) {
                     series_esd1 = x@series_esd[, 1],
                     series_esd2 = x@series_esd[, 2],
                     zero_mean = x@zero_mean,
+                    hessian = x@hessian,
                     niter = niter,
                     seed = seed)
   x@coef <- c(res$phiR, res$phiI)
   x@kalmanlik <- res$ll
-  
+  x@summary <- res$summary
   if(no_series_esd) x@series_esd <- integer(0)
-  
   return(x)
 }
  

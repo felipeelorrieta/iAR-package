@@ -26,7 +26,9 @@ OGLE-ID:175210
 \examples{
 data(dmcep)
 f1=0.7410152
-foldlc(dmcep,f1)
+o1=iAR::utilities()
+o1<-phase(o1,data=dmcep,f1=f1,twop=TRUE)
+plot(o1@times_phased,o1@series_phased,pch=20)
 #fit=harmonicfit(dmcep,f1)
 #f2=0.5433353
 #foldlc(cbind(dmcep$t,fit$res,dmcep$merr),f2)

@@ -19,6 +19,8 @@
 #' @param interpolated_series A numeric vector containing the interpolated series.
 #' @param zero_mean A logical value indicating if the model assumes a zero-mean process (default: TRUE).
 #' @param standardized A logical value indicating if the model assumes a standardized process (default: TRUE).
+#' @param hessian A logical value indicating whether the Hessian matrix is computed during estimation (default: FALSE).
+#' @param summary A list containing the summary of the model fit, including diagnostics and statistical results.
 #'
 #' @section Validation:
 #' - Inherits all validation rules from the `unidata` class:
@@ -97,5 +99,6 @@ CiAR <- S7::new_class(
                     interpolated_times = S7::class_numeric,
                     interpolated_series = S7::class_numeric,
                     zero_mean = S7::new_property(class_logical, default = TRUE),
-                    standardized = S7::new_property(class_logical, default = TRUE))
-)
+                    standardized = S7::new_property(class_logical, default = TRUE),
+                    hessian = S7::new_property(class_logical, default = FALSE),
+                    summary = S7::class_list))

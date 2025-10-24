@@ -20,7 +20,6 @@
 #' \item{norm}{ Mean and variance of the normal distribution of the disordered data.}
 #' \item{z0}{ Statistic of the test (log(abs(phi))).}
 #' \item{pvalue}{ P-value computed for the test.}
-#' @export
 #'
 #' @references
 #' \insertRef{Eyheramendy_2018}{iAR}
@@ -29,7 +28,9 @@
 #'
 #' \code{\link{Planets}},\code{\link{iARTest}}
 #'
+#' @keywords internal
 #' @examples
+#' \dontshow{
 #' data(Planets)
 #' t<-Planets[,1]
 #' res<-Planets[,2]
@@ -39,6 +40,8 @@
 #' #set.seed(6713)
 #' #require(ggplot2)
 #' #test<-iARPermutation(series=y,times=t,coef=res3$coef,model="iAR",plot=TRUE,xlim=c(-9.6,-9.45))
+#' } 
+#' @noRd
 iARPermutation<-function (series, times, series_esd=0, iter = 100, coef,model="iAR", plot = TRUE, xlim = c(-1,0),df=3)
 {
   phi2 = rep(0, iter)

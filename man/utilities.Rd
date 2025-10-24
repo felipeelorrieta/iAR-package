@@ -8,6 +8,13 @@ utilities(
   times = integer(0),
   series = integer(0),
   series_esd = integer(0),
+  times_phased = integer(0),
+  series_phased = integer(0),
+  series_esd_phased = integer(0),
+  fitted_values = integer(0),
+  residuals = integer(0),
+  coef = integer(0),
+  summary = list(),
   paired = integer(0)
 )
 }
@@ -17,6 +24,20 @@ utilities(
 \item{series}{A numeric vector representing the values of the time series.}
 
 \item{series_esd}{A numeric vector representing the error standard deviations of the time series.}
+
+\item{times_phased}{A numeric vector of phased times.}
+
+\item{series_phased}{A numeric vector containing the time series values ordered by phase.}
+
+\item{series_esd_phased}{A numeric vector containing the error standard deviations of the time series ordered by phase.}
+
+\item{fitted_values}{A numeric vector containing the fitted values from the harmonic model.}
+
+\item{residuals}{A numeric vector containing the residuals from the harmonic model.}
+
+\item{coef}{A numeric vector containing the estimated coefficients of the harmonic model.}
+
+\item{summary}{A summary object containing the harmonic model information.}
 
 \item{paired}{Data Frame with the paired datasets.}
 }

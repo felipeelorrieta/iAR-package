@@ -60,6 +60,7 @@ List BiARfit(arma::vec coef, arma::vec series1, arma::vec series2, arma::vec tim
   
   arma::vec y1=series1;
   arma::vec y2=series2;
+
   arma::cx_double phi(coef[0], coef[1]);
 
   double phiMod = std::sqrt(std::pow(phi.real(), 2.0) + std::pow(phi.imag(), 2.0));
@@ -67,7 +68,7 @@ List BiARfit(arma::vec coef, arma::vec series1, arma::vec series2, arma::vec tim
     return output;
   }
 
-  if(zero_mean == FALSE) {
+  if(zero_mean == false) {
     y1 = y1 - arma::mean(y1);
     y2 = y2 - arma::mean(y2);
   }
@@ -125,11 +126,11 @@ List BiARfit(arma::vec coef, arma::vec series1, arma::vec series2, arma::vec tim
   }
 
   arma::mat yhat = G * xhat;
-
   arma::mat finalMat = y - G * xhat;
   arma::mat finalCor = arma::cor(finalMat.t());
   arma::mat finalCov = arma::cov(finalMat.t());
 
+ 
   output["rho"] = finalCor.at(0,1);
   output["innov.var"] = finalCov;
   output["fitted"] = yhat;

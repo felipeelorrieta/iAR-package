@@ -20,7 +20,9 @@ BiAR(
   interpolated_times = integer(0),
   interpolated_series = integer(0),
   zero_mean = TRUE,
-  standardized = TRUE
+  standardized = TRUE,
+  hessian = FALSE,
+  summary = list()
 )
 }
 \arguments{
@@ -55,6 +57,10 @@ BiAR(
 \item{zero_mean}{A logical value indicating if the model assumes a zero-mean process (default: TRUE).}
 
 \item{standardized}{A logical value indicating if the model assumes a standardized process (default: TRUE).}
+
+\item{hessian}{A logical value indicating whether the Hessian matrix is computed during estimation (default: FALSE).}
+
+\item{summary}{A list containing the summary of the model fit, including diagnostics and statistical results.}
 }
 \description{
 Represents a bivariate irregular autoregressive (BiAR) time series model.

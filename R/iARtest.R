@@ -19,7 +19,6 @@
 #' \item{norm}{ Mean and variance of the normal distribution of the bad fitted examples.}
 #' \item{z0}{ Statistic of the test (log(abs(phi))).}
 #' \item{pvalue}{ P-value computed for the test.}
-#' @export
 #'
 #' @references
 #' \insertRef{Eyheramendy_2018}{iAR}
@@ -28,7 +27,9 @@
 #'
 #' \code{\link{clcep}}, \code{\link{harmonicfit}},\code{\link{iARPermutation}}
 #'
+#' @keywords internal
 #' @examples
+#' \dontshow{
 #' data(clcep)
 #' f1=0.060033386
 #' #results=harmonicfit(file=clcep,f1=f1)
@@ -40,6 +41,8 @@
 #' #test<-iARTest(series=clcep[,2],times=clcep[,1],f=f1,coef=res3$coef,
 #' #model="iAR",plot=TRUE,xlim=c(-10,0.5))
 #' #test
+#' }
+#' @noRd
 iARTest<-function (series, times, series_esd=0,f, coef,model="iAR",plot = TRUE, xlim = c(-1, 0),df=3)
 {
   aux = seq(2.5, 47.5, by = 2.5)

@@ -29,6 +29,8 @@ HIP: HIP-54101
 \examples{
 data(clcep)
 f1=0.060033386
-foldlc(clcep,f1)
+o1=iAR::utilities()
+o1<-phase(o1,data=clcep,f1=f1,twop=TRUE)
+plot(o1@times_phased,o1@series_phased,pch=20)
 }
 \keyword{datasets}

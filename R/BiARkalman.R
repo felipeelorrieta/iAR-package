@@ -53,7 +53,7 @@ BiARkalman<-function (series1, series2, times, series_esd1 = 0, series_esd2 = 0,
   if (sum(series_esd2) == 0) {
     series_esd2 = rep(0, length(series2))
   }
-  summary=NULL
+  summary=list()
   for (i in 1:niter) {
     phiR = 2 * runif(1) - 1
     phiI = 2 * runif(1) - 1
