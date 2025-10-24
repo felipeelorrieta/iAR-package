@@ -1,8 +1,10 @@
 url: https://felipeelorrieta.github.io/iAR-package/
+pkgdown:
+  logo: logo_iAR_hex.png
+favicon: logo_iAR_hex.png
 template:
   bootstrap: 5
   bootswatch: flatly
-
 navbar:
   right:
     - text: "Home page"
