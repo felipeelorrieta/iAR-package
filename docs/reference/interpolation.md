@@ -177,7 +177,7 @@ model_BiAR@series=y1
 model_BiAR@series_esd=matrix(0,n,2)
 model_BiAR <- kalman(model_BiAR)
 print(model_BiAR@coef) 
-#> [1] 0.9031073 0.3014462
+#> [1] 0.9152669 0.3041746
 napos=10
 model_BiAR@series[napos,1]=NA
 model_BiAR@series_esd[napos,1]=NA
@@ -185,7 +185,7 @@ model_BiAR <- interpolation(model_BiAR)
 interpolation=na.omit(model_BiAR@interpolated_values[,1])
 mse=as.numeric(y1[napos,1]-interpolation)^2
 print(mse)
-#> [1] 0.3141242
+#> [1] 0.3594054
 par(mfrow=c(2,1))
 plot(times,y[,1],type='l',xlim=c(times[napos-5],times[napos+5]))
 points(times,y[,1],pch=20)
