@@ -6,7 +6,9 @@
 #' 
 #' @usage phase(x, ...)
 #'  
-#' @param x An object of class `utilities`.
+#' @param x An object of class `utilities`, or `NULL` (the default). When `x` is
+#'   `NULL` or omitted, the `utilities` object is created internally, so
+#'   `phase(data = clcep, f1 = f1)` is the recommended usage.
 #' @param ... Additional arguments for pairing time series:
 #'   \describe{
 #'     \item{data}{A data frame with three columns corresponding to the time, values, and standard errors of the irregularly observed time series.}
@@ -32,10 +34,13 @@
 #' @examples
 #' data(clcep)
 #' f1=0.060033386
-#' o1=iAR::utilities()
-#' o1<-phase(o1,data=clcep,f1=f1,twop=TRUE)
+#' o1=phase(data=clcep,f1=f1,twop=TRUE)
 #' plot(o1@times_phased,o1@series_phased,pch=20)
-phase <- S7::new_generic("phase", "x")
+phase <- S7::new_generic("phase", "x", function(x = NULL, ...) S7::S7_dispatch())
+S7::method(phase, NULL) <- function(x, ...) {
+  phase(utilities(), ...)
+}
+
 S7::method(phase, utilities) <- function(x, data, f1, twop=TRUE)
 {
   mycurve = data

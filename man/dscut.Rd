@@ -29,8 +29,7 @@ HIP: HIP 103684
 \examples{
 data(dscut)
 f1=14.88558646
-o1=iAR::utilities()
-o1<-phase(o1,data=dscut,f1=f1,twop=TRUE)
+o1=phase(data=dscut,f1=f1,twop=TRUE)
 plot(o1@times_phased,o1@series_phased,pch=20)
 }
 \keyword{datasets}

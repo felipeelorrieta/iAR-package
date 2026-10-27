@@ -4,7 +4,7 @@
 #' 1. Irregular Autoregressive models (`iAR`)
 #' 2. Complex Irregular Autoregressive models (`CiAR`)
 #' 3. Bivariate Autoregressive models (`BiAR`)
-#' 
+#'
 #' @name forecast
 #'
 #' @param x An object of class \code{iAR}, \code{CiAR}, or \code{BiAR}, containing the model specification and parameters:
@@ -37,7 +37,7 @@
 #'       }
 #'   }
 #'
-#' @param ... Additional arguments (unused).
+#' @param ... Additional arguments.
 #'
 #' @return An updated object of class \code{iAR}, \code{CiAR}, or \code{BiAR}, where the \code{forecast} property contains the forecasted values.
 #'
@@ -61,18 +61,16 @@
 #' library(iAR)
 #' n=100
 #' set.seed(6714)
-#' o=iAR::utilities()
-#' o<-gentime(o, n=n)
-#' times=o@times
-#' model_norm <- iAR(family = "norm", times = times, coef = 0.9)  
+#' times=gentime(n=n)@times
+#' model_norm <- iAR(family = "norm", times = times, coef = 0.9)
 #' model_norm <- sim(model_norm)
-#' model_norm <- kalman(model_norm) 
-#' model_norm@tAhead=1.3
-#' model_norm <- forecast(model_norm)
+#' model_norm <- kalman(model_norm)
+#' tAhead=1.3
+#' model_norm <- forecast(model_norm,tAhead=tAhead)
 #' plot(times, model_norm@series, type = "l", main = "Original Series with Forecast")
-#' points(max(times)+ model_norm@tAhead, model_norm@forecast, col = "blue", pch = 16)
+#' points(max(times)+ tAhead, model_norm@forecast, col = "blue", pch = 16)
 #' plot_forecast(model_norm)
-#' 
+#'
 #' # Example 2: Forecasting with a CiAR model
 #' set.seed(6714)
 #' model_CiAR <- CiAR(times = times,coef = c(0.9, 0))
@@ -86,13 +84,11 @@
 #' model_CiAR@tAhead=1.3
 #' model_CiAR <-forecast(model_CiAR)
 #' model_CiAR@forecast
-#' 
+#'
 #' # Example 3: Forecasting with a BiAR model
 #' n=80
 #' set.seed(6714)
-#' o=iAR::utilities()
-#' o<-gentime(o, n=n)
-#' times=o@times
+#' times=gentime(n=n)@times
 #' model_BiAR <- BiAR(times = times,coef = c(0.9, 0.3), rho = 0.9)
 #' model_BiAR <- sim(model_BiAR)
 #' y=model_BiAR@series
@@ -107,7 +103,11 @@
 #'
 #' @export
 forecast <- S7::new_generic("forecast", "x")
-S7::method(forecast, iAR) <- function(x) {
+S7::method(forecast, iAR) <- function(x,tAhead=NULL) {
+  if(is.null(tAhead))
+    tAhead <- x@tAhead
+  if (!(length(tAhead) == 1 && is.null(dim(tAhead)) && tAhead > 0))
+    stop("'tAhead' must be a strictly positive numeric scalar")
   if(length(x@series)==0) stop("The forecast method needs a time series")
   if(x@family == "norm"){
     if(length(x@coef)==0) stop("The forecast method needs the coefficient of the iAR model")
@@ -115,34 +115,41 @@ S7::method(forecast, iAR) <- function(x) {
                        series = x@series,
                        zero_mean = x@zero_mean,
                        standardized = x@standardized,
-                       tAhead = x@tAhead)
+                       tAhead = tAhead)
     x@forecast <- res
+    x@tAhead <- tAhead
     return(x)
   }
-  
+
   if(x@family == "t"){
     if(length(x@coef)==0) stop("The forecast method needs the coefficient of the iAR-T model")
     res <- iARforecast(coef = x@coef,
                        series = x@series,
                        zero_mean = x@zero_mean,
-                       standardized = FALSE, # preguntar a Felipe
-                       tAhead = x@tAhead)
+                       standardized = FALSE,
+                       tAhead = tAhead)
     x@forecast <- res
+    x@tAhead <- tAhead
     x@standardized <- FALSE
     return(x)
   }
-  
+
   if(x@family == "gamma"){
     if(length(x@coef)==0) stop("The forecast method needs the coefficients of the iAR-Gamma model")
     res <- iARgforecast(coef = x@coef,
                         series = x@series,
                         mean = x@mean,
-                        tAhead = x@tAhead)
+                        tAhead = tAhead)
     x@forecast <- res
+    x@tAhead <- tAhead
     return(x)
   }
 }
-S7::method(forecast, CiAR) <- function(x) {
+S7::method(forecast, CiAR) <- function(x,tAhead=NULL) {
+  if(is.null(tAhead))
+    tAhead <- x@tAhead
+  if (!(length(tAhead) == 1 && is.null(dim(tAhead)) && tAhead > 0))
+    stop("'tAhead' must be a strictly positive numeric scalar")
   if(length(x@series)==0) stop("The forecast method needs a time series")
   if(length(x@coef)==0) stop("The forecast method needs the coefficients of the CiAR model")
   res <- CiARforecast(coef = x@coef,
@@ -150,11 +157,16 @@ S7::method(forecast, CiAR) <- function(x) {
                       times = x@times,
                       zero_mean = x@zero_mean,
                       standardized = x@standardized,
-                      tAhead = x@tAhead)$forecast
+                      tAhead = tAhead)$forecast
   x@forecast <- res
+  x@tAhead <- tAhead
   return(x)
 }
-S7::method(forecast, BiAR) <- function(x) {
+S7::method(forecast, BiAR) <- function(x,tAhead=NULL) {
+  if(is.null(tAhead))
+    tAhead <- x@tAhead
+  if (!(length(tAhead) == 1 && is.null(dim(tAhead)) && tAhead > 0))
+    stop("'tAhead' must be a strictly positive numeric scalar")
   if(length(x@series)==0) stop("The forecast method needs a bivariate time series")
   if(length(x@coef)==0) stop("The forecast method needs the coefficients of the BiAR model")
   res <- t(BiARforecast(coef = x@coef,
@@ -163,7 +175,8 @@ S7::method(forecast, BiAR) <- function(x) {
                         times = x@times,
                         # zero_mean = x@zero_mean,
                         # standardized = x@standardized,
-                        tAhead = x@tAhead)$forecast)
+                        tAhead = tAhead)$forecast)
   x@forecast <- res
+  x@tAhead <- tAhead
   return(x)
 }

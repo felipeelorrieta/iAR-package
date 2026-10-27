@@ -7,7 +7,9 @@
 harmonicfit(x, ...)
 }
 \arguments{
-\item{x}{An object of class `utilities`.}
+\item{x}{An object of class `utilities`, or `NULL` (the default). When `x` is
+`NULL` or omitted, the `utilities` object is created internally, so
+`harmonicfit(data = clcep, f1 = f1)` is the recommended usage.}
 
 \item{...}{Additional arguments for pairing time series:
 \describe{
@@ -34,16 +36,9 @@ The function fits a harmonic regression model with 'nham' components to the inpu
 \examples{
 data(clcep)
 f1=0.060033386
-o1=iAR::utilities()
-o1<-phase(o1,data=clcep,f1=f1)
-#results$R2
-#results$MSE
-#results=harmonicfit(file=clcep[,1:2],f1=f1,nham=3)
-#results$R2
-#results$MSE
-#results=harmonicfit(file=clcep[,1:2],f1=f1,weights=clcep[,3])
-#results$R2
-#results$MSE
+o1=harmonicfit(data=clcep,f1=f1)
+head(o1@fitted_values)
+head(o1@residuals)
 }
 \references{
 \insertRef{Elorrieta_2021}{iAR}

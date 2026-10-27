@@ -324,7 +324,7 @@ CiARsample <- function(phiR, phiI, times, rho = 0L, c = 1L) {
 #' hist(y$series,breaks=20)
 #' }
 #' @noRd
-iARgsample <- function(coef, times, sigma = 1L, mean = 1L) {
+iARgsample <- function(coef, times, sigma = 1.0, mean = 1.0) {
     .Call(`_iAR_iARgsample`, coef, times, sigma, mean)
 }
 

@@ -80,9 +80,7 @@ The coefficients and any family-specific parameters must be set before calling t
 library(iAR)
 n=100
 set.seed(6714)
-o=iAR::utilities()
-o<-gentime(o, n=n)
-times=o@times
+times=gentime(n=n)@times
 model_norm <- iAR(family = "norm", times = times, coef = 0.9,hessian=TRUE)
 model_norm <- sim(model_norm)
 plot(model_norm, type = "l", main = "Simulated iAR-Norm Series")

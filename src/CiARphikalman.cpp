@@ -86,8 +86,9 @@ double CiARphikalman(arma::vec yest,arma::vec coef, arma::vec series, arma::vec 
   arma::mat F(2, 2, fill::zeros);
   arma::mat G(1, 2, fill::zeros);
   G.col(0) = 1;
-
-  double psi = -acos(phi.real()/phiMod);
+	
+  //double psi = -acos(phi.real()/phiMod);
+  double psi = (phi.imag() < 0 && phiMod < 1) ? -acos(phi.real()/phiMod) : acos(phi.real()/phiMod);
   double sumError = 0.0;
   double sumLambda = 0.0;
 

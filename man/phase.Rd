@@ -7,7 +7,9 @@
 phase(x, ...)
 }
 \arguments{
-\item{x}{An object of class `utilities`.}
+\item{x}{An object of class `utilities`, or `NULL` (the default). When `x` is
+`NULL` or omitted, the `utilities` object is created internally, so
+`phase(data = clcep, f1 = f1)` is the recommended usage.}
 
 \item{...}{Additional arguments for pairing time series:
 \describe{
@@ -35,8 +37,7 @@ where \eqn{t_0} is the reference time (by default the first observation),
 \examples{
 data(clcep)
 f1=0.060033386
-o1=iAR::utilities()
-o1<-phase(o1,data=clcep,f1=f1,twop=TRUE)
+o1=phase(data=clcep,f1=f1,twop=TRUE)
 plot(o1@times_phased,o1@series_phased,pch=20)
 }
 \references{

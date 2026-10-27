@@ -76,9 +76,7 @@
 #' library(iAR)
 #' n=100
 #' set.seed(6714)
-#' o=iAR::utilities()
-#' o<-gentime(o, n=n)
-#' times=o@times
+#' times=gentime(n=n)@times
 #' model_norm <- iAR(family = "norm", times = times, coef = 0.9,hessian=TRUE)
 #' model_norm <- sim(model_norm)
 #' plot(model_norm, type = "l", main = "Simulated iAR-Norm Series")
@@ -101,10 +99,8 @@ S7::method(generic = sim, signature = iAR) <- function(x, n = 100, distribution 
                                                        lambda2 = 6.5, p1 = 0.15, p2 = 0.85, a = 0, b = 1) {
     if (is.null(x@times) || length(x@times) == 0) {
       message("Generating irregular time points using the gentime method of the class utilities...")
-      utils <- utilities()
-      utils <- gentime(utils, n = n, distribution = distribution,lambda1 = lambda1, 
-                       lambda2 = lambda2, p1 = p1, p2 = p2, a = a, b = b)
-      x@times <- utils@times
+      x@times <- gentime(NULL, n = n, distribution = distribution, lambda1 = lambda1,
+                         lambda2 = lambda2, p1 = p1, p2 = p2, a = a, b = b)@times
     }
   if(x@family == "norm") {
     if(length(x@coef) == 0) stop("The sim method needs the coefficient of the iAR model")
@@ -120,6 +116,21 @@ S7::method(generic = sim, signature = iAR) <- function(x, n = 100, distribution 
   }
   if(x@family == "gamma") {
     if(length(x@coef) == 0) stop("The sim method needs the coefficient of the iAR-Gamma model")
+    if(x@mean <= 0)
+      stop(paste0(
+        "For family = 'gamma', '@mean' must be strictly positive (got ", x@mean, "). ",
+        "Set e.g. model@mean <- 1 before calling sim()."
+      ))
+    if(x@variance <= 0)
+      stop(paste0(
+        "For family = 'gamma', '@variance' must be strictly positive (got ", x@variance, ")."
+      ))
+    min_gap <- min(diff(x@times))
+    if(min_gap < 1e-6)
+      warning(paste0(
+        "iAR-Gamma: minimum time gap is ", signif(min_gap, 3),
+        ". With phi near 1, very small gaps cause gL -> 0 and numerical instability."
+      ), call. = FALSE)
     res <- iARgsample(coef = x@coef, times = x@times, mean = x@mean, sigma = x@variance)$series
     x@series <- res
     return(x)
@@ -129,10 +140,8 @@ S7::method(generic = sim, signature = CiAR) <- function(x, rho = 0, c = 1, n = 1
                                                         lambda2 = 6.5, p1 = 0.15, p2 = 0.85, a = 0, b = 1) {
   if (is.null(x@times) || length(x@times) == 0) {
     message("Generating irregular time points using the gentime method of the class utilities...")
-    utils <- utilities()
-    utils <- gentime(utils, n = n, distribution = distribution,lambda1 = lambda1, 
-                     lambda2 = lambda2, p1 = p1, p2 = p2, a = a, b = b)
-    x@times <- utils@times
+    x@times <- gentime(NULL, n = n, distribution = distribution, lambda1 = lambda1,
+                       lambda2 = lambda2, p1 = p1, p2 = p2, a = a, b = b)@times
   }
   if(length(x@coef) == 0) stop("The sim method needs the coefficients of the CiAR model")
   res <- CiARsample(phiR = x@coef[1], phiI = x@coef[2], times = x@times, rho = rho, c = c)$series
@@ -143,20 +152,15 @@ S7::method(generic = sim, signature = BiAR) <- function(x, n = 100, distribution
                                                         lambda2 = 6.5, p1 = 0.15, p2 = 0.85, a = 0, b = 1) {
   if (is.null(x@times) || length(x@times) == 0) {
     message("Generating irregular time points using the gentime method of the class utilities...")
-    utils <- utilities()
-    utils <- gentime(utils, n = n, distribution = distribution,lambda1 = lambda1, 
-                     lambda2 = lambda2, p1 = p1, p2 = p2, a = a, b = b)
-    x@times <- utils@times
+    x@times <- gentime(NULL, n = n, distribution = distribution, lambda1 = lambda1,
+                       lambda2 = lambda2, p1 = p1, p2 = p2, a = a, b = b)@times
   }
   if(length(x@coef) == 0) stop("The sim method needs the coefficients of the BiAR model")
-  no_series_esd <- is.integer(x@series_esd)
+  no_series_esd <- length(x@series_esd) == 0
   
-  if(no_series_esd) x@series_esd <- matrix(0, ncol = 2)
-  res <- BiARsample(times = x@times, phiR = x@coef[1], phiI = x@coef[2], series_esd1 = x@series_esd[,1], 
-                    series_esd2 = x@series_esd[,2], rho = x@rho)$series
+  if(no_series_esd) series_esd <- matrix(0, ncol = 2)
+  res <- BiARsample(times = x@times, phiR = x@coef[1], phiI = x@coef[2], series_esd1 = series_esd[,1], 
+                    series_esd2 = series_esd[,2], rho = x@rho)$series
   x@series <- cbind(res[1,],res[2,])
-  
-  if(no_series_esd) x@series_esd <- integer(0)
-  
   return(x)
 }

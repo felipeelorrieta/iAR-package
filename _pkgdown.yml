@@ -6,7 +6,16 @@ template:
   bootstrap: 5
   bootswatch: flatly
 navbar:
-  right:
-    - text: "Home page"
-      href: "https://felipeelorrieta.github.io/"
-      external: true
+  structure:
+    left: [intro, reference, articles, paper, shiny]
+    right: [homepage]
+  components:
+    paper:
+      text: "R Journal paper"
+      href: https://doi.org/10.32614/RJ-2026-036
+    shiny:
+      text: "iAR dashboard"
+      href: https://iargem.shinyapps.io/iarFit/
+    homepage:
+      text: "Home page"
+      href: https://felipeelorrieta.github.io/

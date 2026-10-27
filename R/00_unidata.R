@@ -53,7 +53,7 @@ unidata <- S7::new_class(
       if (anyNA(self@times)) {
         return("NA values are not allowed in @times")
       }
-      if (length(self@series_esd) == length(self@series) & sum(na.omit(self@series_esd))>0) {
+      if (length(self@series_esd) == length(self@series) && anyNA(self@series_esd)) {
         mismatch <- is.na(self@series) != is.na(self@series_esd)
         if (any(mismatch)) {
           return("NA values in @series must correspond to NA values in @series_esd")

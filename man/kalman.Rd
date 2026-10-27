@@ -16,6 +16,7 @@ kalman(x, ...)
       \item \code{series_esd}: A numeric vector specifying the error structure.
       \item \code{zero_mean}: A logical value indicating if the series should be zero-centered.
       \item \code{standardized}: A logical value indicating if the series should be standardized.
+      \item \code{init}: A numeric value specifying the initial value for parameter estimation. Default is 0.1.
     }
   \item For \code{CiAR} models, the object should contain:
     \itemize{
@@ -25,8 +26,7 @@ kalman(x, ...)
       \item \code{zero_mean}: A logical value indicating if the series should be zero-centered.
       \item \code{standardized}: A logical value indicating if the series should be standardized.
       \item \code{c}: A numeric value specifying the scale parameter for the CiAR model.
-      \item \code{niter}: An integer specifying the number of iterations for the Kalman filter.
-      \item \code{seed}: An integer seed for random number generation (optional).
+      \item \code{init}: A numeric vector of length two specifying the initial values for parameter estimation. When provided, these values are included as an additional starting point.
     }
   \item For \code{BiAR} models, the object should contain:
     \itemize{
@@ -34,8 +34,7 @@ kalman(x, ...)
       \item \code{times}: A numeric vector specifying the time points of the series.
       \item \code{series_esd}: A numeric matrix specifying the error structure for both series.
       \item \code{zero_mean}: A logical value indicating if the series should be zero-centered.
-      \item \code{niter}: An integer specifying the number of iterations for the Kalman filter.
-      \item \code{seed}: An integer seed for random number generation (optional).
+      \item \code{init}: A numeric vector of length two specifying the initial values for parameter estimation. When provided, these values are included as an additional starting point.
     }
 }}
 
@@ -62,12 +61,10 @@ The method returns the updated model object, including the estimated parameters 
 library(iAR)
 n=100
 set.seed(6714)
-o=iAR::utilities()
-o<-gentime(o, n=n)
-times=o@times
+times=gentime(n=n)@times
 model_norm <- iAR(family = "norm", times = times, coef = 0.9,hessian=TRUE)
 model_norm <- sim(model_norm)
-model_norm <- kalman(model_norm)  
+model_norm <- kalman(model_norm)
 print(model_norm@coef)  # Access the estimated coefficients
 print(model_norm@kalmanlik)  # Access the Kalman likelihood value
 
@@ -81,7 +78,7 @@ model_CiAR@series=y1
 model_CiAR@series_esd=rep(0,n)
 model_CiAR <- kalman(model_CiAR)
 print(model_CiAR@coef)
-print(model_CiAR@kalmanlik)  
+print(model_CiAR@kalmanlik)
 
 # Example 3: Applying Kalman filter for MLE of BiAR model parameters
 set.seed(6714)
@@ -92,8 +89,8 @@ y1=y/apply(y,2,sd)
 model_BiAR@series=y1
 model_BiAR@series_esd=matrix(0,n,2)
 model_BiAR <- kalman(model_BiAR)
-print(model_BiAR@coef) 
-print(model_BiAR@kalmanlik)  
+print(model_BiAR@coef)
+print(model_BiAR@kalmanlik)
 
 }
 \references{

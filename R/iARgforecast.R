@@ -37,9 +37,14 @@
 #' @noRd
 iARgforecast<-function(coef,mean,series,tAhead)
 {
+  minim=min(series)-0.00001
   y1=series[c(length(series))]
   xd=coef**(tAhead)
   yhat = mean + xd * y1
   fit=c(yhat)
+  if(min(series)<=0)
+  {
+    fit=fit-minim
+  }
   return(fitted=fit)
 }

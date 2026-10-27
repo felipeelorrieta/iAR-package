@@ -66,9 +66,7 @@
 #' library(iAR)
 #' n=100
 #' set.seed(6714)
-#' o=iAR::utilities()
-#' o<-gentime(o, n=n)
-#' times=o@times
+#' times=gentime(n=n)@times
 #' model_norm <- iAR(family = "norm", times = times, coef = 0.9)  
 #' model_norm <- sim(model_norm)
 #' y=model_norm@series
@@ -154,7 +152,7 @@ S7::method(generic = interpolation, signature = iAR) <- function(x, yini = 0) {
           available_data <- vector
           available_times <- x@times
         }
-        if(is.integer(x@series_esd)){
+        if(length(x@series_esd) == 0){
           available_series_esd <- x@series_esd
         } else {
           if((i+1) <= length(nas)) available_series_esd <- x@series_esd[-nas[((i+1):length(nas))]] else available_series_esd <- x@series_esd
@@ -205,7 +203,7 @@ S7::method(generic = interpolation, signature = iAR) <- function(x, yini = 0) {
           available_data <- vector
           available_times <- x@times
         }
-        if(is.integer(x@series_esd)){
+        if(length(x@series_esd) == 0){
           available_series_esd <- x@series_esd
         } else {
           if((i+1) <= length(nas)) available_series_esd <- x@series_esd[-nas[((i+1):length(nas))]] else available_series_esd <- x@series_esd
@@ -257,7 +255,7 @@ S7::method(generic = interpolation, signature = iAR) <- function(x, yini = 0) {
           available_data <- vector
           available_times <- x@times
         }
-        if(is.integer(x@series_esd)){
+        if(length(x@series_esd) == 0){
           available_series_esd <- x@series_esd
         } else {
           if((i+1) <= length(nas)) available_series_esd <- x@series_esd[-nas[((i+1):length(nas))]] else available_series_esd <- x@series_esd
@@ -308,7 +306,7 @@ method(interpolation, CiAR) <- function(x, yini = 0, seed = NULL) {
         available_data <- vector
         available_times <- x@times
       }
-      if(is.integer(x@series_esd)){
+      if(length(x@series_esd) == 0){
         available_series_esd <- x@series_esd
       } else {
         if((i+1) <= length(nas)) available_series_esd <- x@series_esd[-nas[((i+1):length(nas))]] else available_series_esd <- x@series_esd
@@ -345,6 +343,12 @@ method(interpolation, BiAR) <- function(x, yini1 = 0, yini2 = 0, seed = NULL) {
   nas <- sort(unique(unlist(apply(is.na(vector),2,which))))
   auxtimes <- matrix(NA,dim(vector)[1],dim(vector)[2])
   auxseries <-  auxtimes
+  # Local copy of series_esd to avoid mutating the S7 object inside the loop
+  local_esd <- if(length(x@series_esd) == 0) {
+    matrix(0, nrow = length(x@times), ncol = 2)
+  } else {
+    x@series_esd
+  }
   # If there are NA values, return the imputed vector
   if (length(nas) > 0) {
     
@@ -363,15 +367,13 @@ method(interpolation, BiAR) <- function(x, yini1 = 0, yini2 = 0, seed = NULL) {
       }
       na_serie=which(is.na(available_data[na_pos,]))
       nmiss=length(na_serie)
-      if(is.integer(x@series_esd)) x@series_esd <- matrix(0, nrow=length(x@times),ncol = 2)
-      if(is.integer(x@series_esd)){
-        available_series_esd <- x@series_esd
-      } 
-      else {
-        x@series_esd[na_pos,na_serie] <- 0
-        if((i+1) <= length(nas)) available_series_esd <- x@series_esd[-nas[((i+1):length(nas))],] else available_series_esd <- x@series_esd
+      local_esd[na_pos, na_serie] <- 0
+      if((i+1) <= length(nas)) {
+        available_series_esd <- local_esd[-nas[((i+1):length(nas))],]
+      } else {
+        available_series_esd <- local_esd
       }
-      imputed_value <-   iAR:::BiARinterpolation(coef = x@coef,
+      imputed_value <- iAR:::BiARinterpolation(coef = x@coef,
                                            series1 = available_data[,1],
                                            series2 = available_data[,2],
                                            times = available_times,

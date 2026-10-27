@@ -10,8 +10,6 @@
 #' @param series_esd2 Array with the measurements error standard deviations of the second time series of the BiAR process.
 #' @param zero_mean logical; if true, the array y has zero mean; if false, y has a mean different from zero.
 #' @param hessian logical. Indicates whether to compute the Hessian matrix.; if TRUE, the Hessian matrix will be calculated; if FALSE, the Hessian will not be computed.
-#' @param niter Number of iterations in which the function nlminb will be repeated.
-#' @param seed a single value, interpreted as the seed of the random process.
 #'
 #' @return A list with the following components:
 #' \itemize{
@@ -41,33 +39,42 @@
 #' biar
 #' }
 #' @noRd
-BiARkalman<-function (series1, series2, times, series_esd1 = 0, series_esd2 = 0, zero_mean = TRUE, hessian=FALSE,niter = 10, seed = 1234)
+BiARkalman<-function (series1, series2, times, series_esd1 = 0, series_esd2 = 0, zero_mean = TRUE, hessian=FALSE,init=rep(0,2))
 {
-  set.seed(seed)
   aux <- 1e+10
   value <- 1e+10
-  br <- 0
   if (sum(series_esd1) == 0) {
     series_esd1 = rep(0, length(series1))
   }
   if (sum(series_esd2) == 0) {
     series_esd2 = rep(0, length(series2))
   }
+  niter <- if(all(init == c(0,0))) 5 else 6
   summary=list()
   for (i in 1:niter) {
-    phiR = 2 * runif(1) - 1
-    phiI = 2 * runif(1) - 1
-    if (Mod(complex(1, real = phiR, imaginary = phiI)) < 1) {
+    if(i == 1)
+      phi=c(0.1,-0.00001)
+    if(i == 2)
+      phi=c(0.5,0.00001)
+    if(i == 3)
+      phi=c(-0.00001,-0.5)
+    if(i == 4)
+      phi=c(0.5,-0.5)
+    if(i == 5)
+      phi=c(-0.5,0.5)
+    if(!all(init == c(0,0)) && i == 6)
+      phi = init
+    if (Mod(complex(1, real = phi[1], imaginary = phi[2])) < 1) {
       if(hessian==F)
       {
-        optim <- nlminb(start = c(phiR, phiI), objective = BiARphikalman,
+        optim <- nlminb(start = c(phi[1], phi[2]), objective = BiARphikalman,
                       series1 = series1,series2 = series2, times = times, series_esd1 = series_esd1, series_esd2=series_esd2,zero_mean = zero_mean, yest=c(0,0),lower	= c(-1, -1), upper = c(1, 1))
         value <- optim$objective
         par0<-optim$par
       }
       if(hessian==T)
       {
-        out<-optim(par=c(phiR,phiI),fn=BiARphikalman,series1 = series1,series2 = series2, times = times, series_esd1 = series_esd1, series_esd2=series_esd2,zero_mean = zero_mean, yest=c(0,0),method="L-BFGS-B",lower=c(-1,-1),upper=c(1,1),hessian=hessian)
+        out<-optim(par=c(phi[1], phi[2]),fn=BiARphikalman,series1 = series1,series2 = series2, times = times, series_esd1 = series_esd1, series_esd2=series_esd2,zero_mean = zero_mean, yest=c(0,0),method="L-BFGS-B",lower=c(-1,-1),upper=c(1,1),hessian=hessian)
         value<-out$value
         par0<-out$par
       }
@@ -77,16 +84,24 @@ BiARkalman<-function (series1, series2, times, series_esd1 = 0, series_esd2 = 0,
       aux <- value
       if(hessian==T)
       {
+        conv <- out$convergence
         hess=out$hessian
-        stderr=as.numeric(sqrt(diag(solve(hess))))
-        tvalue=par/stderr
-        pvalue=2*pnorm(abs(tvalue),lower.tail=F)
-        summary=list(hess=hess,stderr=stderr,tvalue=tvalue,pvalue=pvalue)
       }
-      br <- br + 1
     }
-    if (aux <= value & br > 1 & i > trunc(niter/2))
-      break
+  }
+  if(hessian==T)
+  {
+    hess_inv <- tryCatch(solve(hess),error = function(e) NULL)
+    if(is.null(hess_inv) || any(!is.finite(hess_inv))) {
+      stderr <- rep(NA_real_, length(par))
+      tvalue <- rep(NA_real_, length(par))
+      pvalue <- rep(NA_real_, length(par))
+    } else {
+      stderr <- as.numeric(sqrt(diag(hess_inv)))
+      tvalue <- par/stderr
+      pvalue <- 2*pnorm(abs(tvalue), lower.tail=FALSE)
+    }
+    summary=list(hess=hess,stderr=stderr,tvalue=tvalue,pvalue=pvalue,convergence=conv)
   }
   if (aux == 1e+10)
     par <- c(0, 0)

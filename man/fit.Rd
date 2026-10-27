@@ -66,9 +66,7 @@ All required parameters (e.g., coefficients, time points) must be set before cal
 library(iAR)
 n=100
 set.seed(6714)
-o=iAR::utilities()
-o<-gentime(o, n=n)
-times=o@times
+times=gentime(n=n)@times
 model_norm <- iAR(family = "norm", times = times, coef = 0.9)  
 model_norm <- sim(model_norm)
 model_norm <- kalman(model_norm) 
@@ -93,9 +91,7 @@ yhat=model_CiAR@fitted_values
 # Example 3: Fitting a BiAR model
 n=80
 set.seed(6714)
-o=iAR::utilities()
-o<-gentime(o, n=n)
-times=o@times
+times=gentime(n=n)@times
 model_BiAR <- BiAR(times = times,coef = c(0.9, 0.3), rho = 0.9)
 model_BiAR <- sim(model_BiAR)
 y=model_BiAR@series

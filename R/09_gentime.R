@@ -3,7 +3,10 @@
 #' A method for generating time points based on a statistical distribution.
 #' The results are stored in the `times` slot of the `utilities` object.
 #'
-#' @param x An object of class `utilities`.
+#' @param x An object of class `utilities`, or `NULL` (the default). When `x` is
+#'   `NULL` or omitted, the `utilities` object is created internally, so
+#'   `gentime(n = 200)` is equivalent to the three-step pattern
+#'   `o <- utilities(); o <- gentime(o, n = 200); o`.
 #' @param ... Additional arguments for generating time points: 
 #'   \describe{
 #'      \item{n}{A positive integer. Length of observation times.}
@@ -28,24 +31,34 @@
 #'
 #' @examples
 #' set.seed(12917)
-#' o1=iAR::utilities()
-#' o1<-gentime(o1, n=200, distribution = "expmixture", lambda1 = 130, 
-#' lambda2 = 6.5,p1 = 0.15, p2 = 0.85)
-#' st=o1@times
+#' st=gentime(n=200, distribution = "expmixture", lambda1 = 130,
+#' lambda2 = 6.5, p1 = 0.15, p2 = 0.85)@times
 #' mean(diff(st))
 #'
-#' o1=iAR::utilities()
-#' o1<-gentime(o1, n=200, distribution = "expmixture", lambda1 = 15, 
-#' lambda2 = 2.5,p1 = 0.15, p2 = 0.85)
-#' st=o1@times
+#' st=gentime(n=200, distribution = "expmixture", lambda1 = 15,
+#' lambda2 = 2.5, p1 = 0.15, p2 = 0.85)@times
 #' mean(diff(st))
 #'
 #' @export
-gentime <- S7::new_generic("gentime", "x")
+gentime <- S7::new_generic("gentime", "x", function(x = NULL, ...) S7::S7_dispatch())
+S7::method(gentime, NULL) <- function(x, n, distribution = "expmixture", lambda1 = 130,
+                                      lambda2 = 6.5, p1 = 0.15, p2 = 0.85, a = 0, b = 1) {
+  gentime(utilities(), n = n, distribution = distribution, lambda1 = lambda1,
+          lambda2 = lambda2, p1 = p1, p2 = p2, a = a, b = b)
+}
+
 S7::method(gentime, utilities) <- function(x, n, distribution = "expmixture", lambda1 = 130, 
                                            lambda2 = 6.5, p1 = 0.15, p2 = 0.85, a = 0, b = 1) {
   if (!is.numeric(n) || length(n) != 1 || n <= 0) {
     stop("'n' must be a positive integer.")
+  }
+  valid_distributions <- c("expmixture", "uniform", "exponential", "gamma")
+  if (!distribution %in% valid_distributions) {
+    stop(paste0(
+      "'distribution' must be one of: ",
+      paste(paste0('"', valid_distributions, '"'), collapse = ", "),
+      ". Got: \"", distribution, "\""
+    ))
   }
   if(distribution=="expmixture")
   {

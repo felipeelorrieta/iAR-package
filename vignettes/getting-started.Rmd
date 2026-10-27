@@ -1,0 +1,366 @@
+---
+title: "Getting Started with iAR"
+author: "Felipe Elorrieta, Cesar Ojeda, Susana Eyheramendy, Wilfredo Palma"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Getting Started with iAR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+## Overview
+
+The **iAR** package provides autoregressive models for time series observed at
+*irregularly spaced* time points, a common situation in astronomy, finance, and
+environmental science. It implements three complementary model classes:
+
+| Class | Coefficient | Autocorrelation | Reference |
+|-------|-------------|-----------------|-----------|
+| `iAR` | Scalar $\phi \in (0,1)$ | Positive only | Eyheramendy et al. (2018) |
+| `CiAR` | Vector $(\phi_R, \phi_I)$, $\|\phi\| < 1$ | Positive *and* negative | Elorrieta et al. (2019) |
+| `BiAR` | Vector $(\phi_R, \phi_I)$, $\|\phi\| < 1$ | Bivariate, cross-correlated | Elorrieta et al. (2021) |
+
+All three share the same workflow: **construct** → **simulate** → **estimate**
+→ **forecast / interpolate**.
+
+```{r load-pkg}
+library(iAR)
+```
+
+---
+
+## Generating Irregular Observation Times
+
+Real astronomical or environmental data is rarely sampled on a regular grid.
+The `gentime()` function generates realistic irregular time grids from several
+distributions. The first argument `x` defaults to `NULL`, so the `utilities`
+object is created internally and you can call `gentime()` directly without any
+setup step.
+
+```{r gentime}
+set.seed(2847)
+
+# x defaults to NULL — no setup needed
+times <- gentime(n = 100)@times
+
+cat("Number of observations:", length(times), "\n")
+cat("Time span: [", round(min(times), 1), ",", round(max(times), 1), "]\n")
+cat("Mean gap between observations:", round(mean(diff(times)), 2), "\n")
+```
+
+The default distribution (`"expmixture"`) mixes two exponential distributions,
+mimicking data sets where most observations are closely spaced but occasional
+long gaps occur. Alternative distributions include `"uniform"`, `"exponential"`,
+and `"gamma"`.
+
+```{r gentime-plot, fig.cap = "Distribution of inter-observation gaps (log scale) for 100 irregular times drawn from an exponential mixture."}
+gaps <- diff(times)
+hist(log1p(gaps),
+     main = "Inter-observation gaps (log1p scale)",
+     xlab = "log(1 + gap)", col = "steelblue", border = "white",
+     breaks = 20)
+```
+
+---
+
+## iAR: Univariate Irregular Autoregressive Model
+
+### Simulation
+
+Construct an `iAR` object with the desired coefficient, then call `sim()`.
+
+```{r iar-sim}
+set.seed(2847)
+times <- gentime(n = 100)@times
+
+# Build the model: family = "norm", phi = 0.9
+m_iar <- iAR(family = "norm", times = times, coef = 0.9)
+m_iar <- sim(m_iar)
+
+head(m_iar@series)
+```
+
+```{r iar-plot, fig.cap = "Simulated iAR series (phi = 0.9). The irregular spacing is visible in the unequal distances along the x-axis."}
+plot(m_iar, type = "o",main = "Simulated iAR series (phi = 0.9)",ylab="Values",xlab="Time",pch=20)
+```
+
+### Parameter Estimation
+
+Two estimators are available:
+
+* **`loglik()`** — direct MLE; supports all three families (`"norm"`, `"t"`,
+  `"gamma"`).
+* **`kalman()`** — Kalman-filter MLE; available for all three model classes
+  (`iAR`, `CiAR`, `BiAR`).
+
+Before estimation, standardise the series (zero mean, unit variance) and supply
+a vector of error standard deviations. For simulated data with no measurement
+noise, zeros suffice.
+
+```{r iar-prep}
+y       <- m_iar@series
+y_std   <- y / sd(y)           # unit variance
+m_iar@series     <- y_std
+m_iar@series_esd <- rep(0, length(times))
+```
+
+#### Using `loglik()`
+
+```{r iar-loglik}
+m_loglik <- loglik(m_iar)
+cat("loglik estimate: phi =", round(m_loglik@coef, 4), "\n")
+cat("Log-likelihood: ", round(m_loglik@loglik, 4), "\n")
+```
+
+#### Using `kalman()`
+
+```{r iar-kalman}
+m_kalman <- kalman(m_iar)
+cat("kalman estimate: phi =", round(m_kalman@coef, 4), "\n")
+cat("Kalman log-lik: ", round(m_kalman@kalmanlik, 4), "\n")
+```
+
+Both estimators should recover a value close to the true $\phi = 0.9$.
+
+#### Standard Errors via the Hessian
+
+Set `hessian = TRUE` to obtain standard errors and p-values.
+
+```{r iar-hessian}
+m_h <- iAR(family = "norm", times = times, coef = 0.9, hessian = TRUE)
+m_h@series     <- y_std
+m_h@series_esd <- rep(0, length(times))
+m_h <- loglik(m_h)
+
+# Summary contains the coefficient, SE, p-value, information criteria, and residual diagnostics
+summary(m_h)
+```
+
+### Forecasting
+
+After estimation, use `forecast()` to predict `tAhead` time units into the future.
+
+```{r iar-forecast}
+m_fc <- forecast(m_kalman, tAhead = 10)
+cat("Forecast (10 time units ahead):", round(m_fc@forecast, 4), "\n")
+```
+
+```{r iar-plot-forecast, fig.cap = "iAR series with one-step-ahead forecast (blue dot)."}
+plot_forecast(m_fc,ylab="Values",xlab="Time",type="o",pch=20)
+```
+
+### Interpolation (Imputing Missing Values)
+
+`interpolation()` imputes `NA` values in the series using the fitted model.
+
+```{r iar-interp}
+# Introduce a missing value at position 10
+m_interp           <- m_kalman
+m_interp@series[10] <- NA
+
+m_interp <- interpolation(m_interp)
+cat("Interpolated value at position 10:",
+    round(m_interp@interpolated_values, 4), "\n")
+cat("Original value at position 10    :",
+    round(y_std[10], 4), "\n")
+```
+
+---
+
+## CiAR: Complex Irregular Autoregressive Model
+
+`CiAR` extends `iAR` to allow **negative autocorrelation** via a complex
+coefficient $\phi = \phi_R + i\,\phi_I$. The stationarity condition is
+$|\phi| = \sqrt{\phi_R^2 + \phi_I^2} < 1$.
+
+### Simulation and Estimation
+
+```{r ciar-sim}
+set.seed(2847)
+times <- gentime(n = 100)@times
+
+# phi = (0.9, 0): purely real CiAR — same as iAR but more general
+m_ciar <- CiAR(times = times, coef = c(0.9, 0))
+m_ciar <- sim(m_ciar)
+
+# Standardise
+y_c           <- m_ciar@series
+y_c_std       <- y_c / sd(y_c)
+m_ciar@series     <- y_c_std
+m_ciar@series_esd <- rep(0, length(times))
+```
+
+```{r ciar-kalman}
+m_ciar <- kalman(m_ciar)
+cat("CiAR estimate: phiR =", round(m_ciar@coef[1], 4),
+    " phiI =", round(m_ciar@coef[2], 4), "\n")
+cat("Modulus |phi| =", round(sqrt(sum(m_ciar@coef^2)), 4), "\n")
+```
+
+### Forecasting
+
+```{r ciar-forecast}
+m_ciar <- forecast(m_ciar, tAhead = 10)
+cat("CiAR forecast:", round(m_ciar@forecast, 4), "\n")
+```
+
+---
+
+## BiAR: Bivariate Irregular Autoregressive Model
+
+`BiAR` models two time series observed at the **same** irregular time points
+with a shared autoregressive structure and cross-correlation $\rho$.
+
+### Simulation
+
+```{r biar-sim}
+set.seed(2847)
+times <- gentime(n = 100)@times
+
+# coef = c(phiR, phiI), rho = cross-series correlation
+m_biar <- BiAR(times = times, coef = c(0.9, 0.3), rho = 0.9)
+m_biar <- sim(m_biar)
+
+head(m_biar@series)   # matrix: column 1 = series 1, column 2 = series 2
+```
+
+### Estimation
+
+```{r biar-kalman}
+n       <- length(times)
+y_b     <- m_biar@series
+y_b_std <- y_b / matrix(apply(y_b, 2, sd), nrow = n, ncol = 2, byrow = TRUE)
+
+m_biar@series     <- y_b_std
+m_biar@series_esd <- matrix(0, n, 2)
+
+m_biar <- kalman(m_biar)
+cat("BiAR estimate: phiR =", round(m_biar@coef[1], 4),
+    " phiI =", round(m_biar@coef[2], 4), "\n")
+```
+
+### Forecasting
+
+```{r biar-forecast}
+m_biar <- forecast(m_biar, tAhead = 10)
+cat("BiAR forecast (series 1):", round(m_biar@forecast[1], 4), "\n")
+cat("BiAR forecast (series 2):", round(m_biar@forecast[2], 4), "\n")
+```
+
+---
+
+## Real Data Example: AGN Light Curve
+
+The package includes the `agn` dataset — 237 K-band flux measurements of the
+active galactic nucleus MCG-6-30-15, taken between 2006 and 2011.
+
+```{r agn-load}
+data(agn)
+head(agn)
+```
+
+```{r agn-plot, fig.cap = "AGN MCG-6-30-15 light curve. Gaps in the observation schedule produce the irregular spacing typical of ground-based astronomical surveys."}
+plot(agn$t, agn$m, xlab = "Heliocentric JD - 2450000",
+     ylab = "Flux [10^-15 erg/s/cm^2/A]",
+     main = "AGN MCG-6-30-15 (K band)",type="o",pch=20)
+```
+
+### Fitting an iAR Model
+
+```{r agn-fit}
+# Standardise: centre and scale by SD (measurement errors available)
+y_agn   <- agn$m
+y_agn_c <- (y_agn - mean(y_agn)) / sd(y_agn)
+esd_agn <- agn$merr / sd(y_agn)
+
+m_agn <- iAR(
+  family     = "norm",
+  times      = agn$t,
+  series     = y_agn_c,
+  series_esd = esd_agn
+)
+
+m_agn <- kalman(m_agn)
+cat("Estimated phi:", round(m_agn@coef, 4), "\n")
+cat("Kalman log-lik:", round(m_agn@kalmanlik, 4), "\n")
+```
+
+### Fitted Values and Forecast
+
+```{r agn-fit-plot, fig.cap = "AGN light curve (standardised) with fitted iAR values overlaid."}
+m_agn <- fit(m_agn)
+plot_fit(m_agn, xlab = "Heliocentric JD - 2450000",
+     ylab = "Flux [10^-15 erg/s/cm^2/A]",type="o",pch=20)
+```
+
+```{r agn-forecast}
+m_agn <- forecast(m_agn, tAhead = 1)
+cat("One-step-ahead forecast:", round(m_agn@forecast, 4), "\n")
+```
+
+---
+
+## Utility: Pairing Two Irregular Time Series
+
+When two series are observed at different (but overlapping) time points,
+`pairingits()` matches them within a tolerance window before fitting a `BiAR`
+model.
+
+```{r pair}
+data(cvnovag)
+data(cvnovar)
+
+# Pair the G-band and R-band CV Nova light curves
+paired <- pairingits(data1 = cvnovag, data2 = cvnovar, tol = 0.01)
+
+cat("Paired observations:", nrow(paired@paired), "\n")
+head(paired@paired)
+```
+
+---
+
+## Summary
+
+The table below collects the key functions for each step of the modelling
+workflow.
+
+| Step | iAR | CiAR | BiAR |
+|------|-----|------|------|
+| Construct | `iAR(family, times, coef)` | `CiAR(times, coef)` | `BiAR(times, series, coef, rho)` |
+| Simulate | `sim(m)` | `sim(m)` | `sim(m)` |
+| Estimate (direct MLE) | `loglik(m)` | — | — |
+| Estimate (Kalman) | `kalman(m)` | `kalman(m)` | `kalman(m)` |
+| Forecast | `forecast(m, tAhead)` | `forecast(m, tAhead)` | `forecast(m, tAhead)` |
+| Interpolate | `interpolation(m)` | `interpolation(m)` | `interpolation(m)` |
+| Plot fitted | `plot_fit(m)` | `plot_fit(m)` | `plot_fit(m)` |
+| Plot forecast | `plot_forecast(m)` | `plot_forecast(m)` | `plot_forecast(m)` |
+| Generate times | `gentime(n = ...)` | — | — |
+| Pair two series | `pairingits(data1, data2)` | — | — |
+
+## References
+
+Eyheramendy, S., Elorrieta, F., & Palma, W. (2018). An irregular discrete time
+series model to identify residuals with autocorrelation in astronomical light
+curves. *Monthly Notices of the Royal Astronomical Society*, **481**(4),
+4990–5003. <doi:10.1093/mnras/sty2487>
+
+Elorrieta, F., Eyheramendy, S., & Palma, W. (2019). Discrete semi-parametric
+model for the investigation of variable stars. *Astronomy & Astrophysics*,
+**627**, A120. <doi:10.1051/0004-6361/201935560>
+
+Elorrieta, F., Eyheramendy, S., Palma, W., & Ojeda, C. (2021). A bivariate
+irregular autoregressive model. *Monthly Notices of the Royal Astronomical
+Society*, **505**(1), 1105–1116. <doi:10.1093/mnras/stab1216>

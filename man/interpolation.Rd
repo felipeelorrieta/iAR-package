@@ -68,9 +68,7 @@ For the \code{CiAR} and \code{BiAR} models, the error standard deviations and in
 library(iAR)
 n=100
 set.seed(6714)
-o=iAR::utilities()
-o<-gentime(o, n=n)
-times=o@times
+times=gentime(n=n)@times
 model_norm <- iAR(family = "norm", times = times, coef = 0.9)  
 model_norm <- sim(model_norm)
 y=model_norm@series

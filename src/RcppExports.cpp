@@ -127,15 +127,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // iARgsample
-List iARgsample(double coef, arma::vec times, int sigma, int mean);
+List iARgsample(double coef, arma::vec times, double sigma, double mean);
 RcppExport SEXP _iAR_iARgsample(SEXP coefSEXP, SEXP timesSEXP, SEXP sigmaSEXP, SEXP meanSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< double >::type coef(coefSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type times(timesSEXP);
-    Rcpp::traits::input_parameter< int >::type sigma(sigmaSEXP);
-    Rcpp::traits::input_parameter< int >::type mean(meanSEXP);
+    Rcpp::traits::input_parameter< double >::type sigma(sigmaSEXP);
+    Rcpp::traits::input_parameter< double >::type mean(meanSEXP);
     rcpp_result_gen = Rcpp::wrap(iARgsample(coef, times, sigma, mean));
     return rcpp_result_gen;
 END_RCPP

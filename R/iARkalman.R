@@ -33,8 +33,11 @@
 #' print(phi)
 #' }
 #' @noRd
-iARkalman<-function (series, times, series_esd=0,zero_mean=TRUE,standardized=TRUE,hessian=FALSE)
+iARkalman<-function (series, times, series_esd=0,zero_mean=TRUE,standardized=TRUE,hessian=FALSE,init=0.1)
 {
+  if(!is.numeric(init) || length(init)!=1 || !is.finite(init) ||
+     init<0 || init>=1)
+    stop("initialization value must be a finite number between 0 and 1.",call.=FALSE)
   if(sum(series_esd)==0){
     series_esd=rep(0,length(series))}
   summary=NULL
@@ -47,14 +50,22 @@ iARkalman<-function (series, times, series_esd=0,zero_mean=TRUE,standardized=TRU
   }
   if(hessian==T)
   {
-    out=optim(par=c(x=0),fn=iARphikalman, series=series, times=times, series_esd=series_esd, zero_mean = zero_mean,yest=0, standardized = standardized,method="L-BFGS-B",lower=0,upper=0.9999999,hessian=hessian)
+    out=optim(par=c(x=init),fn=iARphikalman, series=series, times=times, series_esd=series_esd, zero_mean = zero_mean,yest=0, standardized = standardized,method="L-BFGS-B",lower=0,upper=0.9999999,hessian=hessian)
     phi=as.numeric(out$par)
+    conv <- out$convergence
     ll=out$value
     hess=as.numeric(out$hessian)
-    stderr=sqrt(diag(solve(hess)))
-    tvalue=phi/stderr
-    pvalue=2*pnorm(abs(tvalue),lower.tail=F)
-    summary=list(hess=hess,stderr=stderr,tvalue=tvalue,pvalue=pvalue)
+    hess_inv <- tryCatch(solve(hess),error = function(e) NULL)
+    if(is.null(hess_inv) || any(!is.finite(hess_inv))) {
+      stderr <- NA_real_
+      tvalue <- NA_real_
+      pvalue <- NA_real_
+    } else {
+      stderr <- sqrt(diag(hess_inv))
+      tvalue <- phi/stderr
+      pvalue <- 2*pnorm(abs(tvalue), lower.tail=FALSE)
+    }
+    summary=list(hess=hess,stderr=stderr,tvalue=tvalue,pvalue=pvalue,convergence=conv)
   }
   return(list(coef=phi,kalman=ll,summary=summary))
 }

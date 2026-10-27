@@ -37,7 +37,7 @@ forecast(x, ...)
     }
 }}
 
-\item{...}{Additional arguments (unused).}
+\item{...}{Additional arguments.}
 }
 \value{
 An updated object of class \code{iAR}, \code{CiAR}, or \code{BiAR}, where the \code{forecast} property contains the forecasted values.
@@ -65,16 +65,14 @@ All required parameters (e.g., coefficients, time points) must be set before cal
 library(iAR)
 n=100
 set.seed(6714)
-o=iAR::utilities()
-o<-gentime(o, n=n)
-times=o@times
-model_norm <- iAR(family = "norm", times = times, coef = 0.9)  
+times=gentime(n=n)@times
+model_norm <- iAR(family = "norm", times = times, coef = 0.9)
 model_norm <- sim(model_norm)
-model_norm <- kalman(model_norm) 
-model_norm@tAhead=1.3
-model_norm <- forecast(model_norm)
+model_norm <- kalman(model_norm)
+tAhead=1.3
+model_norm <- forecast(model_norm,tAhead=tAhead)
 plot(times, model_norm@series, type = "l", main = "Original Series with Forecast")
-points(max(times)+ model_norm@tAhead, model_norm@forecast, col = "blue", pch = 16)
+points(max(times)+ tAhead, model_norm@forecast, col = "blue", pch = 16)
 plot_forecast(model_norm)
 
 # Example 2: Forecasting with a CiAR model
@@ -94,9 +92,7 @@ model_CiAR@forecast
 # Example 3: Forecasting with a BiAR model
 n=80
 set.seed(6714)
-o=iAR::utilities()
-o<-gentime(o, n=n)
-times=o@times
+times=gentime(n=n)@times
 model_BiAR <- BiAR(times = times,coef = c(0.9, 0.3), rho = 0.9)
 model_BiAR <- sim(model_BiAR)
 y=model_BiAR@series

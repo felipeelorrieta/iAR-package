@@ -57,7 +57,8 @@ List CiARsample(double phiR, double phiI, arma::vec times, int rho = 0, int c = 
     return output;
   }
 
-  double psi = -acos(phi.real()/phiMod);
+  //double psi = -acos(phi.real()/phiMod);
+  double psi = (phi.imag() < 0 && phiMod < 1) ? -acos(phi.real()/phiMod) : acos(phi.real()/phiMod);
 
   arma::vec eR = arma::randn(n);
   arma::vec eI = arma::randn(n);

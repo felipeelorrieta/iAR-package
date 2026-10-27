@@ -1,10 +1,8 @@
 #include <RcppArmadillo.h>
-#include <string.h>
-#include <cmath>
+#include <math.h>
 
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::plugins(cpp11)]]
-
 using namespace Rcpp;
 using namespace arma;
 
@@ -57,6 +55,13 @@ double iARphigamma(arma::vec yest,arma::vec coef, arma::vec series, arma::vec ti
 
   arma::vec gL(n-1, fill::zeros);
   gL = sigma * (1 - arma::pow(xd,2));
+
+  if (arma::any(gL <= 0.0) ||
+    arma::any(yhat <= 0.0) ||
+    !gL.is_finite() ||
+    !yhat.is_finite()) {
+    return 1e10;
+  }
 
   arma::vec beta(n-1, fill::zeros);
   beta=gL/yhat;

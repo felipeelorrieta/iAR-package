@@ -45,7 +45,6 @@ double iARphikalman(arma::vec yest,double coef, arma::vec series, arma::vec seri
   arma::vec y = series;
   arma::vec y_copy = series;
 
-  //Removing NA elements before join them
   uvec y_NA_indexes = arma::find_nonfinite(y);
 
   if(y_NA_indexes.size() > 0) {

@@ -7,7 +7,9 @@
 pairingits(x, ...)
 }
 \arguments{
-\item{x}{An object of class `utilities`.}
+\item{x}{An object of class `utilities`, or `NULL` (the default). When `x` is
+`NULL` or omitted, the `utilities` object is created internally, so
+`pairingits(data1 = ts1, data2 = ts2)` is the recommended usage.}
 
 \item{...}{Additional arguments for pairing time series: 
 \describe{
@@ -31,10 +33,7 @@ The method checks the observational times in both input time series and pairs th
 \examples{
 data(cvnovag)
 data(cvnovar)
-datag=cvnovag
-datar=cvnovar
-o1=iAR::utilities()
-o1<-pairingits(o1, datag,datar,tol=0.1)
+o1=pairingits(data1=cvnovag, data2=cvnovar, tol=0.1)
 pargr1=na.omit(o1@paired)
 st=apply(pargr1[,c(1,4)],1,mean)
 model_BiAR <- BiAR(times = st,series=pargr1[,c(2,5)],series_esd=pargr1[,c(3,6)])

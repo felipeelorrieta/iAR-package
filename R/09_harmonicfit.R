@@ -6,7 +6,9 @@
 #' 
 #' @usage harmonicfit(x, ...)
 #'  
-#' @param x An object of class `utilities`.
+#' @param x An object of class `utilities`, or `NULL` (the default). When `x` is
+#'   `NULL` or omitted, the `utilities` object is created internally, so
+#'   `harmonicfit(data = clcep, f1 = f1)` is the recommended usage.
 #' @param ... Additional arguments for pairing time series:
 #'   \describe{
 #'     \item{data}{A data frame with three columns corresponding to the time, values, and standard errors of the irregularly observed time series.}
@@ -29,17 +31,14 @@
 #' @examples
 #' data(clcep)
 #' f1=0.060033386
-#' o1=iAR::utilities()
-#' o1<-phase(o1,data=clcep,f1=f1)
-#' #results$R2
-#' #results$MSE
-#' #results=harmonicfit(file=clcep[,1:2],f1=f1,nham=3)
-#' #results$R2
-#' #results$MSE
-#' #results=harmonicfit(file=clcep[,1:2],f1=f1,weights=clcep[,3])
-#' #results$R2
-#' #results$MSE
-harmonicfit <- S7::new_generic("harmonicfit", "x")
+#' o1=harmonicfit(data=clcep,f1=f1)
+#' head(o1@fitted_values)
+#' head(o1@residuals)
+harmonicfit <- S7::new_generic("harmonicfit", "x", function(x = NULL, ...) S7::S7_dispatch())
+S7::method(harmonicfit, NULL) <- function(x, ...) {
+  harmonicfit(utilities(), ...)
+}
+
 S7::method(harmonicfit, utilities) <- function (x,data, f1, nham = 4, weighted=FALSE, remove_trend=TRUE)
 {
   mycurve = data

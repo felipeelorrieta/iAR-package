@@ -15,6 +15,7 @@ loglik(x, ...)
   \item \code{zero_mean}: Logical. Indicates whether the series should be mean-centered.
   \item \code{standardized}: Logical. Indicates whether the series is standardized.
   \item \code{hessian}: Logical. If \code{TRUE}, the function computes the Hessian matrix for parameter estimation.
+  \item \code{init}: Initial values for parameter estimation. For \code{family = "norm"}, a single numeric value (default 0.1). For \code{family = "t"}, a numeric vector of length two. For \code{family = "gamma"}, a numeric vector of length three.
   \item \code{family}: The distribution family of the iAR model (one of "norm", "t", or "gamma").
   \item \code{df}: Degrees of freedom for the t-distribution (only for \code{family = "t"}).
   \item \code{sigma}: The scale parameter for the t-distribution (only for \code{family = "t"}).
@@ -40,14 +41,14 @@ Maximum Likelihood Estimation for irregular autoregressive (iAR) models, support
 normal (`iAR`), t (`iAR-T`), and gamma (`iAR-Gamma`).
 }
 \details{
-This method estimates the parameters of an iAR model using the Maximum Likelihood Estimation (MLE) approach. 
+This method estimates the parameters of an iAR model using the Maximum Likelihood Estimation (MLE) approach.
 Depending on the chosen distribution family, the corresponding likelihood function is maximized:
 \itemize{
   \item "norm" maximizes the likelihood for a normally-distributed series.
   \item "t" maximizes the likelihood for a t-distributed series.
   \item "gamma" maximizes the likelihood for a gamma-distributed series.
 }
-The function updates the \code{iAR} object with the estimated parameters, the log-likelihood value, and a summary 
+The function updates the \code{iAR} object with the estimated parameters, the log-likelihood value, and a summary
 table that includes standard errors and p-values.
 }
 \examples{

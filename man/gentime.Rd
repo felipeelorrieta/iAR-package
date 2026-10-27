@@ -4,10 +4,13 @@
 \alias{gentime}
 \title{Generating Irregularly spaced times}
 \usage{
-gentime(x, ...)
+gentime(x = NULL, ...)
 }
 \arguments{
-\item{x}{An object of class `utilities`.}
+\item{x}{An object of class `utilities`, or `NULL` (the default). When `x` is
+`NULL` or omitted, the `utilities` object is created internally, so
+`gentime(n = 200)` is equivalent to the three-step pattern
+`o <- utilities(); o <- gentime(o, n = 200); o`.}
 
 \item{...}{Additional arguments for generating time points: 
 \describe{
@@ -35,16 +38,12 @@ The results are stored in the `times` slot of the `utilities` object.
 }
 \examples{
 set.seed(12917)
-o1=iAR::utilities()
-o1<-gentime(o1, n=200, distribution = "expmixture", lambda1 = 130, 
-lambda2 = 6.5,p1 = 0.15, p2 = 0.85)
-st=o1@times
+st=gentime(n=200, distribution = "expmixture", lambda1 = 130,
+lambda2 = 6.5, p1 = 0.15, p2 = 0.85)@times
 mean(diff(st))
 
-o1=iAR::utilities()
-o1<-gentime(o1, n=200, distribution = "expmixture", lambda1 = 15, 
-lambda2 = 2.5,p1 = 0.15, p2 = 0.85)
-st=o1@times
+st=gentime(n=200, distribution = "expmixture", lambda1 = 15,
+lambda2 = 2.5, p1 = 0.15, p2 = 0.85)@times
 mean(diff(st))
 
 }

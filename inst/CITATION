@@ -1,0 +1,18 @@
+bibentry(
+  bibtype = "Article",
+  title = "The R Journal: iAR: An R Package for Autoregressive Modeling Irregularly Observed Time Series",
+  author = c(
+    person("Felipe", "Elorrieta"),
+    person("Susana", "Eyheramendy"),
+    person("Wilfredo", "Palma"),
+    person("Cesar", "Ojeda")
+  ),
+  journal = "The R Journal",
+  year = "2026",
+  volume = "18",
+  number = "3",
+  pages = "1",
+  issn = "2073-4859",
+  doi = "10.32614/RJ-2026-036",
+  url = "https://doi.org/10.32614/RJ-2026-036"
+)

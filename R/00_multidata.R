@@ -59,7 +59,7 @@ multidata <- S7::new_class(
       return("Number of rows in @series must match length of @times")
     }
     }
-    if (length(self@series_esd) > 2) {
+    if (length(self@series_esd) > 0 && length(self@series) > 0) {
       if (!all(dim(self@series) == dim(self@series_esd))) {
         return("Dimensions of @series_esd must match those of @series")
       }

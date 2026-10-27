@@ -1,24 +1,27 @@
 #' `iAR` Class
 #'
-#' Represents a univariate irregular autoregressive (iAR) time series model. 
-#' This class extends the "unidata" class and includes additional properties 
+#' Represents a univariate irregular autoregressive (iAR) time series model.
+#' This class extends the "unidata" class and includes additional properties
 #' for modeling, forecasting, and interpolation.
 #'
 #' @param times A numeric vector representing the time points.
 #' @param series A numeric vector representing the values of the time series.
 #' @param series_esd A numeric vector representing the error standard deviations of the time series.
-#' @param series_names An optional character vector of length 1 representing the name of the series. 
+#' @param series_names An optional character vector of length 1 representing the name of the series.
 #' @param family A character string indicating the distribution family of the model. Must be one of `"norm"`, `"t"`, or `"gamma"`. Defaults to `"norm"`.
 #' @param fitted_values A numeric vector containing the fitted values from the model.
 #' @param loglik A numeric value representing the log-likelihood of the model.
 #' @param kalmanlik A numeric value representing the Kalman likelihood of the model.
-#' @param coef A numeric vector containing the estimated coefficients of the model (default: 0.9).
+#' @param coef A single numeric value (scalar) representing the autoregressive coefficient,
+#'   strictly between 0 and 1 (default: 0.9). Note that `iAR` only supports positive
+#'   autocorrelation. Unlike [CiAR] and [BiAR], which use a numeric vector of length 2,
+#'   this argument must be a scalar; passing a vector will raise a validation error.
 #' @param df A numeric value representing the degrees of freedom (`t` distribution) (default: 3).
 #' @param sigma A numeric value representing the scale parameter (`t` distribution) (default: 1).
 #' @param mean A numeric value representing the estimated mean of the model (`gamma` parameter).
 #' @param variance A numeric value representing the estimated variance of the model (`gamma` parameter).
-#' @param tAhead A numeric value specifying the forecast horizon (default: 1).
 #' @param forecast A numeric vector containing the forecasted values.
+#' @param tAhead A numeric value specifying the forecast horizon (default: 1).
 #' @param interpolated_values A numeric vector containing the interpolated values.
 #' @param interpolated_times A numeric vector containing the times of the interpolated data points.
 #' @param interpolated_series A numeric vector containing the interpolated series.
@@ -35,7 +38,7 @@
 #'  - The length of `@series_esd` must be 0, 1, or equal to the length of `@series`.
 #'  - `NA` values in `@series` must correspond exactly (positionally) to `NA` values in `@series_esd`.
 #'  - `@series_names`, if provided, must be a character vector of length 1.
-#' 
+#'
 #' - `@family` must be one of `"norm"`, `"t"`, or `"gamma"`.
 #' - `@coef` must be a numeric scalar strictly between 0 and 1.
 #' - `@df` must be a positive integer scalar **only if** `family = "t"`; otherwise, it should not be specified.
@@ -46,9 +49,9 @@
 
 #'
 #' @details
-#' The `iAR` class is designed to handle irregularly observed time series data using an 
-#' autoregressive approach. It extends the "unidata" class to include additional 
-#' modeling and diagnostic capabilities. Key functionalities include forecasting, 
+#' The `iAR` class is designed to handle irregularly observed time series data using an
+#' autoregressive approach. It extends the "unidata" class to include additional
+#' modeling and diagnostic capabilities. Key functionalities include forecasting,
 #' interpolation, and model fitting.
 #'
 #' The class also supports advanced modeling features, such as:
@@ -61,9 +64,8 @@
 #'
 #' @examples
 #' # Create an `iAR` object
-#' o=iAR::utilities()
-#' o<-gentime(o, n=200, distribution = "expmixture", lambda1 = 130, lambda2 = 6.5,p1 = 0.15, p2 = 0.85)
-#' times=o@times
+#' times=gentime(n=200, distribution = "expmixture",
+#'              lambda1 = 130, lambda2 = 6.5, p1 = 0.15, p2 = 0.85)@times
 #' my_iAR <- iAR(family = "norm", times = times, coef = 0.9,hessian=TRUE)
 #'
 #' my_iAR@family
@@ -89,8 +91,21 @@ iAR <- S7::new_class(
                       S7::class_numeric,
                       default = 0.9,
                       validator = function(value) {
-                        if (!(length(value) == 1 && is.null(dim(value)) && value > 0 && value < 1)) {
-                          return("'coef' must be a value strictly between 0 and 1")
+                        if (!(length(value) == 1 && is.null(dim(value)))) {
+                          return(paste0(
+                            "'coef' for iAR must be a single numeric scalar, not a vector. ",
+                            "For a length-2 coefficient use CiAR or BiAR instead."
+                          ))
+                        }
+                        if (value <= 0) {
+                          return(paste0(
+                            "'coef' must be strictly between 0 and 1. ",
+                            "iAR only supports positive autocorrelation; ",
+                            "for negative autocorrelation use CiAR instead."
+                          ))
+                        }
+                        if (value >= 1) {
+                          return("'coef' must be strictly between 0 and 1 (stationarity requires phi < 1).")
                         }
                         NULL
                       }
@@ -135,7 +150,7 @@ iAR <- S7::new_class(
                         }
                         NULL
                       }
-                    ), #gamma
+                    ),
                     tAhead = S7::new_property(
                       S7::class_numeric,
                       default = 1,

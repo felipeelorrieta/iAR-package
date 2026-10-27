@@ -9,9 +9,6 @@
 #' @param standardized logical; if TRUE, the array series is standardized; if FALSE, series contains the raw time series.
 #' @param hessian logical. Indicates whether to compute the Hessian matrix.; if TRUE, the Hessian matrix will be calculated; if FALSE, the Hessian will not be computed.
 #' @param c Nuisance parameter corresponding to the variance of the imaginary part.
-#' @param niter Number of iterations in which the function nlminb will be repeated.
-
-#' @param seed a single value, interpreted as the seed of the random process.
 #'
 #' @return A list with the following components:
 #' \itemize{
@@ -41,19 +38,30 @@
 #' Mod(complex(real=ciar$phiR,imaginary=ciar$phiI))
 #' }
 #' @noRd
-CiARkalman<-function(series,times,series_esd=0,zero_mean=TRUE,standardized=TRUE,hessian=FALSE,c=1,niter=10,seed=1234)
+CiARkalman<-function(series,times,series_esd=0,zero_mean=TRUE,standardized=TRUE,hessian=FALSE,c=1,init=rep(0,2))
 {
-  set.seed(seed)
   aux<-1e10
   value<-1e10
-  br<-0
   if(sum(series_esd)==0){
     series_esd=rep(0,length(series))}
   summary=list()
+  niter <- if(all(init == c(0,0))) 5 else 6
   for(i in 1:niter)
   {
-    phiR=2*runif(1)-1
-    phiI=2*runif(1)-1
+    if(i == 1)
+      phi=c(0.1,-0.00001)
+    if(i == 2)
+      phi=c(0.5,0.00001)
+    if(i == 3)
+      phi=c(-0.00001,-0.5)
+    if(i == 4)
+      phi=c(0.5,-0.5)
+    if(i == 5)
+      phi=c(-0.5,0.5)
+    if(!all(init == c(0,0)) && i == 6)
+      phi = init
+    phiR=phi[1]
+    phiI=phi[2]
     if(Mod(complex(1,real=phiR,imaginary=phiI))<1)
     {
       if(hessian==F)
@@ -79,16 +87,24 @@ CiARkalman<-function(series,times,series_esd=0,zero_mean=TRUE,standardized=TRUE,
       aux<-value
       if(hessian==T)
       {
+        conv <- out$convergence
         hess=out$hessian
-        stderr=as.numeric(sqrt(diag(solve(hess))))
-        tvalue=par/stderr
-        pvalue=2*pnorm(abs(tvalue),lower.tail=F)
-        summary=list(hess=hess,stderr=stderr,tvalue=tvalue,pvalue=pvalue)
       }
-      br<-br+1
     }
-    if(aux<=value & br>1 & i>trunc(niter/2))
-      break;
+  }
+  if(hessian==T)
+  {
+    hess_inv <- tryCatch(solve(hess),error = function(e) NULL)
+    if(is.null(hess_inv) || any(!is.finite(hess_inv))) {
+      stderr <- rep(NA_real_, length(par))
+      tvalue <- rep(NA_real_, length(par))
+      pvalue <- rep(NA_real_, length(par))
+    } else {
+      stderr <- as.numeric(sqrt(diag(hess_inv)))
+      tvalue <- par/stderr
+      pvalue <- 2*pnorm(abs(tvalue), lower.tail=FALSE)
+    }
+    summary=list(hess=hess,stderr=stderr,tvalue=tvalue,pvalue=pvalue,convergence=conv)
   }
   if(aux==1e10)
     par<-c(0,0)

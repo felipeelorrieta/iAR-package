@@ -37,9 +37,10 @@ using namespace arma;
 // [[Rcpp::export]]
 double iARphiloglik(double coef, arma::vec series, arma::vec times, arma::vec series_esd, bool zero_mean = true, bool standardized = true) {
   arma::vec y = series;
+  arma::vec y_copy = series;
   double x = coef;
   double sigma = 1;
-  int mu = 0;
+  double mu = 0;
 
   int n = y.size();
   arma::vec delta(n - 1, fill::zeros);
@@ -48,16 +49,23 @@ double iARphiloglik(double coef, arma::vec series, arma::vec times, arma::vec se
     delta = series_esd.rows(1, n-1);
   }
 
+  uvec y_NA_indexes = arma::find_nonfinite(y);
+
+  if(y_NA_indexes.size() > 0) {
+    y_copy.shed_rows(y_NA_indexes);
+  }
+
   if(standardized==false) {
-    sigma = arma::var(y);
+    sigma = arma::var(y_copy);
   }
 
   if(zero_mean == false) {
-    mu = arma::mean(y);
+    mu = arma::mean(y_copy);
   }
 
   arma::vec d = arma::diff(times);
   arma::vec phi(n-1, fill::zeros);
+  if(x >= 0.0 && x < 1.0) {
   for(int i = 0; i < n-1; ++i) {
     phi[i] = std::pow(x, d[i]);
   }
@@ -75,4 +83,7 @@ double iARphiloglik(double coef, arma::vec series, arma::vec times, arma::vec se
   arma::vec temp3 = arma::pow(temp2, 2);
 
   return cte + 0.5 * arma::sum(temp1 + temp3/temp0);
+  } else {
+    return 1e10;
+  } 
 }

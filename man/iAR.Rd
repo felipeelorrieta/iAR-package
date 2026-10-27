@@ -46,7 +46,10 @@ iAR(
 
 \item{kalmanlik}{A numeric value representing the Kalman likelihood of the model.}
 
-\item{coef}{A numeric vector containing the estimated coefficients of the model (default: 0.9).}
+\item{coef}{A single numeric value (scalar) representing the autoregressive coefficient,
+strictly between 0 and 1 (default: 0.9). Note that `iAR` only supports positive
+autocorrelation. Unlike [CiAR] and [BiAR], which use a numeric vector of length 2,
+this argument must be a scalar; passing a vector will raise a validation error.}
 
 \item{df}{A numeric value representing the degrees of freedom (`t` distribution) (default: 3).}
 
@@ -75,14 +78,14 @@ iAR(
 \item{summary}{A list containing the summary of the model fit, including diagnostics and statistical results.}
 }
 \description{
-Represents a univariate irregular autoregressive (iAR) time series model. 
-This class extends the "unidata" class and includes additional properties 
+Represents a univariate irregular autoregressive (iAR) time series model.
+This class extends the "unidata" class and includes additional properties
 for modeling, forecasting, and interpolation.
 }
 \details{
-The `iAR` class is designed to handle irregularly observed time series data using an 
-autoregressive approach. It extends the "unidata" class to include additional 
-modeling and diagnostic capabilities. Key functionalities include forecasting, 
+The `iAR` class is designed to handle irregularly observed time series data using an
+autoregressive approach. It extends the "unidata" class to include additional
+modeling and diagnostic capabilities. Key functionalities include forecasting,
 interpolation, and model fitting.
 
 The class also supports advanced modeling features, such as:
@@ -110,9 +113,8 @@ The class also supports advanced modeling features, such as:
 
 \examples{
 # Create an `iAR` object
-o=iAR::utilities()
-o<-gentime(o, n=200, distribution = "expmixture", lambda1 = 130, lambda2 = 6.5,p1 = 0.15, p2 = 0.85)
-times=o@times
+times=gentime(n=200, distribution = "expmixture",
+             lambda1 = 130, lambda2 = 6.5, p1 = 0.15, p2 = 0.85)@times
 my_iAR <- iAR(family = "norm", times = times, coef = 0.9,hessian=TRUE)
 
 my_iAR@family

@@ -11,7 +11,10 @@
 #' @param fitted_values A numeric vector containing the fitted values from the model.
 #' @param loglik A numeric value representing the log-likelihood of the model.
 #' @param kalmanlik A numeric value representing the Kalman likelihood of the model.
-#' @param coef A numeric vector containing the estimated coefficients of the model.
+#' @param coef A numeric vector of length 2 containing the autoregressive (phiR) and
+#'   cross-correlation (phiI) coefficients of the model. Each value must be in [-1, 1]
+#'   and the modulus `sqrt(phiR^2 + phiI^2)` must be less than 1. Defaults to `c(0.8, 0)`.
+#'   Unlike [iAR], which uses a scalar, both [CiAR] and `BiAR` use a length-2 vector.
 #' @param rho A numeric vector containing the estimated coefficients of the model.
 #' @param tAhead A numeric value specifying the forecast horizon (default: 1).
 #' @param forecast A numeric vector containing the forecasted values.
@@ -32,6 +35,7 @@
 #' - If `@series_esd` contains NA values, they must correspond positionally to NA values in `@series`.
 #' - `@series_names`, if provided, must be a character vector with length equal to the number of columns in `@series`, and all names must be unique.
 #' - `@coef` must be a numeric vector of length 2, with each element strictly between -1 and 1.
+#' - The modulus `sqrt(phiR^2 + phiI^2)` must be strictly less than 1 (stationarity condition).
 #' - `@tAhead` must be a strictly positive numeric scalar.
 #'
 #' @details
@@ -50,9 +54,8 @@
 #'
 #'
 #' @examples
-#' o=iAR::utilities()
-#' o<-gentime(o, n=200, distribution = "expmixture", lambda1 = 130, lambda2 = 6.5,p1 = 0.15, p2 = 0.85)
-#' times=o@times
+#' times=gentime(n=200, distribution = "expmixture",
+#'              lambda1 = 130, lambda2 = 6.5, p1 = 0.15, p2 = 0.85)@times
 #' my_BiAR <- BiAR(times = times,coef = c(0.9, 0.3), rho = 0.9)
 #'
 #' # Access properties
@@ -78,6 +81,13 @@ BiAR <- S7::new_class(
                         if (any(value < -1 | value > 1)) {
                           return("Each value in 'coef' must be between -1 and 1")
                         }
+                        if (sqrt(sum(value^2)) >= 1) {
+                          return(paste0(
+                            "The modulus sqrt(phiR^2 + phiI^2) must be strictly less than 1 ",
+                            "(got ", round(sqrt(sum(value^2)), 4), "). ",
+                            "See the stationarity condition for BiAR models."
+                          ))
+                        }
                         NULL
                       }
                     ),
@@ -93,7 +103,18 @@ BiAR <- S7::new_class(
                         NULL
                       }
                     ),
-                    rho = S7::new_property(class_numeric, default = 0),
+                    rho = S7::new_property(
+                      class_numeric,
+                      default = 0,
+                      validator = function(value) {
+                        if (!(length(value) == 1 &&
+                              is.null(dim(value)) &&
+                              value >= -1 && value <= 1)) {
+                          return("'rho' must be a single numeric value in [-1, 1]")
+                        }
+                        NULL
+                      }
+                    ),
                     forecast = S7::class_numeric,
                     interpolated_values = S7::class_numeric,
                     interpolated_times = S7::class_numeric,

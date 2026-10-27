@@ -2,19 +2,22 @@
 % Please edit documentation in R/08_summary.R
 \name{summary}
 \alias{summary}
-\title{Summary Method for unidata Objects}
+\title{Summary of iAR package models}
+\usage{
+summary(object, ...)
+}
 \arguments{
-\item{object}{An object of class `unidata`. This object contains the fitted 
-iAR model, including parameters such as coefficients (`coef`), 
-standard errors (`stderr`), t-values (`tvalue`), p-values (`pvalue`), 
-family type (`family`), and other model-specific parameters.}
+\item{object}{An object of class `iAR`, `CiAR`, `BiAR`, or `utilities`.
+For fitted model objects, this contains model-specific parameters such as
+coefficients (`coef`), standard errors (`stderr`), t-values (`tvalue`),
+p-values (`pvalue`), and other class-specific components.}
 
 \item{...}{Additional arguments (unused).}
 }
 \description{
-This method provides a summary of the `unidata` object, which represents 
-an iAR (irregular autoregressive) model. The summary includes information 
-about the model family (e.g., "normal", "t", "gamma"), the coefficients, 
-standard errors, t-values, and p-values. The output is formatted to display 
-the relevant statistics based on the model family.
+This method provides a summary for objects created by the iAR package,
+including `iAR`, `CiAR`, `BiAR`, and `utilities` objects. For fitted model
+objects, the summary reports model-specific information such as the model
+family, coefficients, standard errors, t-values, and p-values.
+The output is formatted to display the relevant statistics based on the model class.
 }

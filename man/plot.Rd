@@ -3,10 +3,15 @@
 \name{plot}
 \alias{plot}
 \title{Plot Method for unidata Objects}
+\usage{
+plot(x, y, ...)
+}
 \arguments{
 \item{x}{An object of class `unidata` or `multidata`. This object must contain the time 
 series in the `series` slot and the associated time points in the 
 `times` slot.}
+
+\item{y}{Ignored. Present for compatibility with the base \code{plot} generic.}
 
 \item{...}{Additional arguments passed to the `plot.zoo` function for 
 customizing the plot (e.g., titles, colors, etc.).}

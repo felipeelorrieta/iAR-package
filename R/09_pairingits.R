@@ -5,7 +5,9 @@
 #' 
 #' @usage pairingits(x, ...)
 #' 
-#' @param x An object of class `utilities`.
+#' @param x An object of class `utilities`, or `NULL` (the default). When `x` is
+#'   `NULL` or omitted, the `utilities` object is created internally, so
+#'   `pairingits(data1 = ts1, data2 = ts2)` is the recommended usage.
 #' @param ... Additional arguments for pairing time series: 
 #'   \describe{
 #'     \item{data1}{A data frame with three columns corresponding to the first irregularly observed time series.}
@@ -28,16 +30,25 @@
 #' @examples
 #' data(cvnovag)
 #' data(cvnovar)
-#' datag=cvnovag
-#' datar=cvnovar
-#' o1=iAR::utilities()
-#' o1<-pairingits(o1, datag,datar,tol=0.1)
+#' o1=pairingits(data1=cvnovag, data2=cvnovar, tol=0.1)
 #' pargr1=na.omit(o1@paired)
 #' st=apply(pargr1[,c(1,4)],1,mean)
 #' model_BiAR <- BiAR(times = st,series=pargr1[,c(2,5)],series_esd=pargr1[,c(3,6)])
 #' model_BiAR <- kalman(model_BiAR)
 #' 
-pairingits <- S7::new_generic("pairingits", "x")
+pairingits <- S7::new_generic("pairingits", "x", function(x = NULL, ...) S7::S7_dispatch())
+
+S7::method(pairingits, NULL) <- function(x, data1, data2, tol = 0.1) {
+  pairingits(utilities(), data1 = data1, data2 = data2, tol = tol)
+}
+
+S7::method(pairingits, S7::class_any) <- function(x, data2, tol = 0.1) {
+  if (!is.data.frame(x))
+    stop("No method for pairingits() with x of class '", class(x)[1],
+         "'. Supply a data.frame or omit x entirely.", call. = FALSE)
+  pairingits(utilities(), data1 = x, data2 = data2, tol = tol)
+}
+
 S7::method(pairingits, utilities) <- function(x, data1,data2,tol=0.1)
 {
   t1=data1[,1]

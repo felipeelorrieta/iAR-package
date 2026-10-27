@@ -36,7 +36,11 @@ CiAR(
 
 \item{kalmanlik}{A numeric value representing the Kalman likelihood of the model.}
 
-\item{coef}{A numeric vector of length 2, containing the coefficients of the model. Each value must lie within [-1, 1]. Defaults to `c(0.9, 0)`.}
+\item{coef}{A numeric vector of length 2 containing the real (phiR) and imaginary (phiI)
+parts of the autoregressive coefficient. Each value must be in [-1, 1] and the modulus
+`sqrt(phiR^2 + phiI^2)` must be strictly less than 1 (stationarity condition).
+Defaults to `c(0.9, 0)`. Unlike [iAR], which uses a scalar, both `CiAR` and [BiAR]
+use a length-2 vector.}
 
 \item{tAhead}{A numeric value specifying the forecast horizon (default: 1).}
 
@@ -86,13 +90,13 @@ or positive autocorrelation.
 
 - `@coef` must be a numeric vector of length 2 with no dimensions.
 - Each value in `@coef` must be in the interval [-1, 1].
+- The modulus `sqrt(phiR^2 + phiI^2)` must be strictly less than 1 (stationarity condition).
 - `@tAhead` must be a strictly positive numeric scalar.
 }
 
 \examples{
-o=iAR::utilities()
-o<-gentime(o, n=200, distribution = "expmixture", lambda1 = 130, lambda2 = 6.5,p1 = 0.15, p2 = 0.85)
-times=o@times
+times=gentime(n=200, distribution = "expmixture",
+             lambda1 = 130, lambda2 = 6.5, p1 = 0.15, p2 = 0.85)@times
 my_CiAR <- CiAR(times = times,coef = c(0.9, 0))
 
 # Access properties

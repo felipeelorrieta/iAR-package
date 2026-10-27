@@ -30,9 +30,14 @@
 iARgfit<-function(coef,mean,series,times)
 {
   delta=diff(times)
+  minim=min(series)-0.00001
   y1=series[-c(length(series))]
   xd=coef**delta
   yhat = mean + xd * y1
   fit=c(mean,yhat)
+  if(min(series)<=0)
+  {
+    fit=fit-minim
+  }
   return(fitted=fit)
 }

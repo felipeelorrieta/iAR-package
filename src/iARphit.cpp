@@ -44,6 +44,8 @@ double iARphit(arma::vec yest,arma::vec coef, arma::vec series, arma::vec times,
   arma::vec d = arma::diff(times);
 
   arma::vec xd(n-1, fill::zeros);
+  double x = arma::as_scalar(coef.row(0));
+  if(x >= 0.0 && x < 1.0) {
   for(int i = 0; i < n-1; ++i) {
     xd[i] = std::pow(arma::as_scalar(coef.row(0)), d[i]);
   }
@@ -68,4 +70,7 @@ double iARphit(arma::vec yest,arma::vec coef, arma::vec series, arma::vec times,
   double out = cte - s1 - ((df+1)/2) * s2 - 0.5 * (std::log(2*datum::pi) + std::pow(arma::as_scalar(y.row(0)), 2));
 
   return -out;
+  } else {
+    return 1e10;
+  } 
 }
